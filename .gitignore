@@ -1,3 +1,6 @@
+# Folders
+data/*
+
+# Files
 *.csv
-occlusion_datasets/*
 *.pdf
