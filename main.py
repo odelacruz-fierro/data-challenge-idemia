@@ -1,11 +1,16 @@
 
 
+from src import config
+
 
 
 def main():
-    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+
+    print("*****************************************************")
     print("Welcome to Data Challenge Idemia from Télécom Paris")
-    print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
+    print("*****************************************************")
+
+    print(f"Loading data from: {config.RAW_DATA_DIR}")
 
 
 

@@ -3,6 +3,9 @@
 import torch
 import torchvision.transforms as transforms
 import numpy as np
+from PIL import Image
+
+from src import config
 
 class Dataset(torch.utils.data.Dataset):
     'Characterizes a dataset for PyTorch'
@@ -38,4 +41,15 @@ class Dataset(torch.utils.data.Dataset):
             y = None
             gender = None
             return X, filename
-    print(IMAGE_DIR)
+    print(config.IMAGE_DIR)
+
+
+if __name__ == "__main__":
+    print("*****************************************************")
+    print("dataset.py")
+    print("*****************************************************")
+
+    import pandas as pd
+    
+    df_train = pd.read_csv(config.DF_TRAIN, delimiter=',')
+    training_set = Dataset(config.DF_TRAIN, config.IMAGE_DIR)
