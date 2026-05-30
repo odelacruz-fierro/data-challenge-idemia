@@ -13,9 +13,5 @@ def main():
     print(f"Loading data from: {config.RAW_DATA_DIR}")
 
 
-
-
-
-
 if __name__ == "__main__":
     main()

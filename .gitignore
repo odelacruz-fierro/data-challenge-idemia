@@ -1,5 +1,6 @@
 # Folders
 data/*
+src/__pycache__
 
 # Files
 *.csv
