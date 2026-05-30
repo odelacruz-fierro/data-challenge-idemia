@@ -16,6 +16,8 @@ IMAGE_TEST = f"/{IMAGE_DIR}/database1/img00000048.webp"
 
 # Parameters
 
+
+
 params_train = {'batch_size': 64,
           'shuffle': True,
           'num_workers': 4}
