@@ -2,6 +2,7 @@
 from PIL import Image
 from tqdm import tqdm
 from src import config
+from prettytable import PrettyTable
 
 def check_images_integrity(df,image_dir):
 
@@ -13,6 +14,20 @@ def check_images_integrity(df,image_dir):
         except ValueError as e:
             print(idx, e)
 
+def count_parameters(model):
+    table = PrettyTable(["Modules", "Parameters"])
+    total_trainable_params = 0
+    total_params = 0
+    for name, parameter in model.named_parameters():
+        params = parameter.numel()
+        total_params += params
+        if not parameter.requires_grad:
+            continue
+        table.add_row([name, params])
+        total_trainable_params += params
+    print(table)
+    print(f"Total Trainable Params: {total_trainable_params}")
+    print(f"Total Params: {total_params}")
 
 
 
@@ -32,9 +47,9 @@ if __name__ == "__main__":
     df_train = df_train.dropna()
     df_test = df_test.dropna()
 
-    # Split into train and validation
-    df_val = df_train.loc[:20000].reset_index()
-    df_train = df_train.loc[20000:].reset_index()
+    # Data split
+    df_val = df_train.iloc[:20000].reset_index(drop = True)
+    df_train = df_train.iloc[20000:].reset_index(drop = True)
 
     # -------------------------------------------------
     # Data integrity check

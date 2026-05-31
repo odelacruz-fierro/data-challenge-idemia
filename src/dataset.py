@@ -23,7 +23,7 @@ class Dataset(torch.utils.data.Dataset):
     def __getitem__(self, index):
         'Generates one sample of data'
         # Select sample
-        row = self.df.loc[index]
+        row = self.df.iloc[index]
         filename = row['filename']
 
         # Load data and get label
@@ -61,9 +61,9 @@ if __name__ == "__main__":
     df_train = df_train.dropna()
     df_test = df_test.dropna()
 
-    # Split into train and validation
-    df_val = df_train.loc[:20000].reset_index()
-    df_train = df_train.loc[20000:].reset_index()
+    # Data split
+    df_val = df_train.iloc[:20000].reset_index(drop = True)
+    df_train = df_train.iloc[20000:].reset_index(drop = True)
 
     # Make Dataloader
     training_set = Dataset(df_train, config.IMAGE_DIR)
