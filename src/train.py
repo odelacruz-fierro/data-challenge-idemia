@@ -49,6 +49,11 @@ def train_one_epoch(model, dataloader, optimizer, loss_fn, epoch):
         
         
         
+if __name__ == "__main__":
 
+    print()
+    print("*****************************************************")
+    print("train.py")
+    print("*****************************************************")
 
 
