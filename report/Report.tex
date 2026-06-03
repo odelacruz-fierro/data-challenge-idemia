@@ -56,7 +56,7 @@ In the context of the Data Challenge proposed by Idemia, the objective is to pre
 In this report, we present our solution based on multi-task learning, designed to extract robust features while minimizing the demographic bias penalty.
 
 % ===================================================
-% --- Section
+% --- Exploratory Data Analysis
 % ===================================================
 \section{Exploratory Data Analysis}
 
@@ -64,21 +64,34 @@ The exploratory data analysis performed on the train database revealed that only
 value $\approx 0.4$ (see Fig.\ref{fig:occlusion_distribution}) and an unbalance distribution in terms of gender, i.e. Men = 67.6 \% and Women = 32.4 \%
 (see Fig.\ref{fig:gender_distribution}).
 
-\begin{figure}[h]
+From Fig.\ref{fig:occlusion_distribution} we can observe a right-skewed distribution. We can observe a longer tail on the right side, which
+indicates that the concentration is more towards the lower values and the extreme high values (outliers) drag the tail towards the right side.
+
+In order to better understand the visual impact of the occlusion levels, random samples of different occlusion intervals were inspected (see Fig.\ref{fig:occlusion_mosaic}).
+
+
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.9\columnwidth]{figures/occlusion_distribution.pdf}
     \caption{Distribution of occlusion across the training dataset.}
-    \label{fig:occlusion_distribution}
+    \label{fig:occlusion_distribution}  
 \end{figure}
 
 
-\begin{figure}[h]
+\begin{figure}[ht]
     \centering
     \includegraphics[width=0.9\columnwidth]{figures/gender_distribution.pdf}
     \caption{Distribution of gender across the training dataset: Men = 67.6 \% and Women = 32.4 \%.}
     \label{fig:gender_distribution}
 \end{figure}
 
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{figures/occlusion_mosaic.pdf}
+    \caption{Random samples for three occlusion intervals: Low $\in$ [0.0,0.3], Medium $\in$ [0.31,0.6] and High $\in$ [0.61, 1.0].}
+    \label{fig:occlusion_mosaic}
+\end{figure}
 % ===================================================
 % --- Section
 % ===================================================
