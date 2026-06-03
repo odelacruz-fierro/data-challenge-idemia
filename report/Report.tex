@@ -1,0 +1,124 @@
+\documentclass[10pt, twocolumn]{article}
+
+% --- Packages ---
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[margin=0.75in]{geometry} % Optimized margins for 2-page limit
+\usepackage{graphicx}
+\usepackage{booktabs} % For beautiful tables
+\usepackage{amsmath}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{abstract}
+
+% --- Clickable Links Config ---
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=blue,
+}
+
+% --- Compact Headings ---
+\titlespacing{\section}{0pt}{*2}{*1}
+\titlespacing{\subsection}{0pt}{*1}{*1}
+
+% --- Title Information ---
+\title{\vspace{-1.5cm}\textbf{Idemia Datachallenge (IADATA704): \\ Face Occlusion Prediction}}
+\author{
+    \textbf{Group Name:} Team GPU \\
+    \textbf{Group Number:} 21 \\
+    \textbf{Team Members:} Oscar DE LA CRUZ, Rémi HAMON
+}
+
+\date{    
+    %\fbox{
+        \parbox{\textwidth}{
+            \centering
+            \textbf{Project repository:}
+            \url{https://github.com/odelacruz-fierro/data-challenge-idemia.git}
+        }
+    %}
+    \vspace{-0.5cm}
+}
+
+
+\begin{document}
+
+\maketitle
+
+% --- 1. Introduction ---
+
+\section{Introduction}
+In the context of the Data Challenge proposed by Idemia, the objective is to predict the percentage of facial occlusion in "in the wild" images (224x224 pixels). The major challenge lies in handling the training data imbalance (a low proportion of highly occluded faces) and the strict gender fairness requirement imposed by the evaluation metric.
+
+In this report, we present our solution based on multi-task learning, designed to extract robust features while minimizing the demographic bias penalty.
+
+
+% --- 2. Exploratory Data Analysis ---
+\section{Exploratory Data Analysis}
+
+
+
+% --- 3. Methodology & Architecture ---
+\section{Methodology \& Architecture}
+
+\subsection{Milti-Task Learning (MLT)}
+Although the primary task is a simple regression (occlusion score), we opted for a two-head architecture. As demonstrated in the literature, the addition of an auxiliary task acts as a regularizer. The first head predicts the occlusion (via a Sigmoid activation), while the second predicts gender. This structure forces the shared feature extractor to focus on deep semantic facial features.
+
+\subsection{Backbone}
+Nous avons utilisé \texttt{MobileNetV3-Small} pré-entraîné sur ImageNet comme tronc commun. Ce choix s'explique par sa légèreté, permettant des itérations rapides.
+\\ \textbf{THIS PART WILL EVOLVE !!!}
+
+% Placeholder for a model figure
+\begin{figure}[h]
+    \centering
+    % \includegraphics[width=\columnwidth]{model_architecture.png}
+    \vspace{3cm} % Remove this vspace when you add your image
+    \caption{Architecture du modèle Multi-Tâches avec ses deux têtes de prédiction.}
+    \label{fig:architecture}
+\end{figure}
+
+% --- 3. Training & Custom Loss ---
+\section{Stratégie d'Entraînement}
+\subsection{Fonction de Perte Personnalisée}
+Pour aligner notre modèle avec la métrique d'Idemia, nous avons implémenté une \textit{Weighted Mean Squared Error} (MSE). Les échantillons avec une forte occlusion vraie ($GT_i$) reçoivent un poids supérieur selon la formule $w_i = \frac{1}{30} + GT_i$.
+
+\subsection{Data Augmentation}
+Afin d'atténuer le \textit{Domain Shift}, nous avons utilisé \texttt{RandomErasing} pour générer artificiellement des masques noirs aléatoires sur le set d'entraînement, forçant le modèle à traiter des cas d'occlusion extrêmes.
+
+% --- 4. Results ---
+\section{Résultats Expérimentaux}
+Notre modèle a été évalué sur le sous-ensemble "interim" du Leaderboard. Le tableau \ref{tab:results} résume nos performances.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcc}
+        \toprule
+        \textbf{Modèle} & \textbf{MSE Validation} & \textbf{Score Leaderboard} \\
+        \midrule
+        Baseline (MSE) & 0.045 & 0.01250 \\
+        Ours (Custom Loss) & 0.021 & \textbf{0.00115} \\
+        \bottomrule
+    \end{tabular}
+    \caption{Comparaison des approches implémentées.}
+    \label{tab:results}
+\end{table}
+
+% --- 5. Limitations & Perspectives ---
+\section{Limites de l'Approche}
+Bien que performante, notre solution présente plusieurs limites :
+\begin{itemize}
+    \item \textbf{Complexité de l'hyper-paramétrage :} L'approche Multi-Tâches nécessite de régler manuellement le poids relatif ($\lambda$) entre la perte d'occlusion et la perte de genre. Un mauvais équilibrage détériore les deux métriques.
+    \item \textbf{Sensibilité au Biais Initial :} Si le \textit{batch size} est trop petit, la pénalité de \textit{fairness} fluctue énormément d'une époque à l'autre.
+    \item \textbf{Puissance de Calcul :} L'architecture actuelle est légère (MobileNet), mais des tentatives d'utilisation de modèles plus profonds (ResNet50, Swin Transformers) ont été limitées par nos ressources de calcul locales avant le passage sur le cluster.
+\end{itemize}
+
+\section{Conclusion}
+Notre approche démontre qu'une fonction de perte ciblée couplée à une régularisation par Multi-Task Learning permet de répondre efficacement aux contraintes spécifiques d'Idemia. Des travaux futurs pourraient inclure un \textit{Oversampling} dynamique pour annuler totalement la pénalité de genre.
+
+% --- References ---
+% \bibliographystyle{plain}
+% \bibliography{references} % Uncomment if you use a .bib file
+
+\end{document}
