@@ -48,7 +48,6 @@
 \maketitle
 
 % --- 1. Introduction ---
-
 \section{Introduction}
 In the context of the Data Challenge proposed by Idemia, the objective is to predict the percentage of facial occlusion in "in the wild" images (224x224 pixels). The major challenge lies in handling the training data imbalance (a low proportion of highly occluded faces) and the strict gender fairness requirement imposed by the evaluation metric.
 
@@ -57,6 +56,23 @@ In this report, we present our solution based on multi-task learning, designed t
 
 % --- 2. Exploratory Data Analysis ---
 \section{Exploratory Data Analysis}
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{figures/occlusion_distribution.pdf}
+    \caption{Distribution of occlusion across the training dataset.}
+    \label{fig:gender_distribution}
+\end{figure}
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{figures/gender_distribution.pdf}
+    \caption{Distribution of gender across the training dataset: Men = 67.6 \% and Women = 32.4 \%.}
+    \label{fig:gender_distribution}
+\end{figure}
+
 
 
 
