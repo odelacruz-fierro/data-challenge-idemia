@@ -62,6 +62,7 @@ while minimizing the demographic bias penalty.
 % --- Exploratory Data Analysis
 % ===================================================
 \section{Exploratory Data Analysis}
+\label{sec:eda}
 
 The exploratory data analysis (EDA) performed on the train database revealed that only a low proportion of the faces show a high occlusion.
 This is verified by Fig.\ref{fig:train_occlusion_distribution}, where we can observe a right-skewed distribution: the samples are more concentrated
@@ -156,7 +157,13 @@ Figure \ref{fig:occlusion_mosaic} provides simples for each interval. The above-
 
 \subsection{Data augmentation}
 \label{sec:data-augmentation}
-Interesting fact, in most of the pictures the face covers most of the frame.
+
+The goal of this section is to increase the diversity of the train database in order to match close enough
+the distribution of the test database. The results from the EDA in section \ref{sec:eda} showed that 
+in $medium$ occluded faces part of their faces are covered by some "object", \textit{i.e.} hair, hand, hat, etc.
+On the other hand, $high$ occluded images are mainly blurry / noised. In order to consider for these variations,
+to data augmentation strategies were considered: 1) kernel filtering and 2) random erasing.
+
 %Afin d'atténuer le \textit{Domain Shift}, nous avons utilisé \texttt{RandomErasing} pour générer artificiellement des masques noirs aléatoires sur le set d'entraînement, forçant le modèle à traiter des cas d'occlusion extrêmes.
 
 
