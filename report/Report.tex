@@ -48,7 +48,7 @@
 \maketitle
 
 % ===================================================
-% --- Section
+% --- INtroduction
 % ===================================================
 \section{Introduction}
 In the context of the Data Challenge proposed by Idemia, the objective is to predict the percentage of facial occlusion in "in the wild" images (224x224 pixels). The major challenge lies in handling the training data imbalance (a low proportion of highly occluded faces) and the strict gender fairness requirement imposed by the evaluation metric.
@@ -68,6 +68,10 @@ From Fig.\ref{fig:occlusion_distribution} we can observe a right-skewed distribu
 indicates that the concentration is more towards the lower values and the extreme high values (outliers) drag the tail towards the right side.
 
 In order to better understand the visual impact of the occlusion levels, random samples of different occlusion intervals were inspected (see Fig.\ref{fig:occlusion_mosaic}).
+Even though inspection was not exhaustive, we can note a couple of interesting observations: meantime faces with a Low level of occlusion look
+normal, faces with Medium level occlusion will be impacted by hair, hands/arms or a hat. Finally the images with a High level of occlusion
+are not necessarily covered but kind of blurry. If we assume these factors as representative of the whole dataset (train + test)
+this learning could be useful if doing data augmentation.
 
 
 \begin{figure}[ht]
