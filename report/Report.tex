@@ -48,39 +48,49 @@
 \maketitle
 
 % ===================================================
-% --- INtroduction
+% --- Introduction
 % ===================================================
 \section{Introduction}
-In the context of the Data Challenge proposed by Idemia, the objective is to predict the percentage of facial occlusion in "in the wild" images (224x224 pixels). The major challenge lies in handling the training data imbalance (a low proportion of highly occluded faces) and the strict gender fairness requirement imposed by the evaluation metric.
+In the context of the Data Challenge proposed by Idemia, the objective is to predict the percentage of facial occlusion
+in images (224x224 pixels). The major challenge lies in handling the training data imbalance (a low proportion of the training database
+contain highly occluded faces) and the gender fairness requirement imposed by the evaluation metric.
 
-In this report, we present our solution based on multi-task learning, designed to extract robust features while minimizing the demographic bias penalty.
+In this report, we present our solution based on multi-task learning and data augmentaion, designed to extract robust features
+while minimizing the demographic bias penalty.
 
 % ===================================================
 % --- Exploratory Data Analysis
 % ===================================================
 \section{Exploratory Data Analysis}
 
-The exploratory data analysis performed on the train database revealed that only a low proportion of the faces show a high occlusion
-value $\approx 0.4$ (see Fig.\ref{fig:occlusion_distribution}) and an unbalance distribution in terms of gender, i.e. Men = 67.6 \% and Women = 32.4 \%
-(see Fig.\ref{fig:gender_distribution}).
+The exploratory data analysis (EDA) performed on the train database revealed that only a low proportion of the faces show a high occlusion.
+This is verified by Fig.\ref{fig:train_occlusion_distribution}, where we can observe a right-skewed distribution: the samples are more concentrated
+on the lower values than in the extreme high values, whici drag the tail towards the right side.
 
-From Fig.\ref{fig:occlusion_distribution} we can observe a right-skewed distribution. We can observe a longer tail on the right side, which
-indicates that the concentration is more towards the lower values and the extreme high values (outliers) drag the tail towards the right side.
+From a gender perspective, it was found that the train database contains 67.6 \% of men and 32.4 \% of women (see Fig.\ref{fig:gender_distribution}).
 
-In order to better understand the visual impact of the occlusion levels, random samples of different occlusion intervals were inspected (see Fig.\ref{fig:occlusion_mosaic}).
-Even though inspection was not exhaustive, we can note a couple of interesting observations: meantime faces with a Low level of occlusion look
-normal, faces with Medium level occlusion will be impacted by hair, hands/arms or a hat. Finally the images with a High level of occlusion
-are not necessarily covered but kind of blurry. If we assume these factors as representative of the whole dataset (train + test)
-this learning could be useful if doing data augmentation.
+In order to understand what different occlusion levels looked-like, images were sampled out from the train database
+using different occlusion intervals, \textit{i.e.} $Low \in [0.1, 0.3]$, $Medium \in [0.31, 0.4]$ and $High \in [0.7, 1.0]$.
+These intervals were defined based on the test database occlusion distribution provided with the Data Challenge (see Fig.\ref{fig:test_occlusion_distribution}).
+The results of this sampling process allow to make some interesting observations:
+
+\begin{itemize}
+    \item $low$ occluded images trend to provide a global visibility of the face forehead, eyes, nose, chicks and chin.
+    It's worth noting that the neck is not visible. 
+    \item in $medium$ occluded images par of the faces are covered either with the hair, a hat, hand, fingers and even physical objects.
+    \item  Finally in $high$ occluded images faces seem to be mostly visible, however a blurry / noised effect was noticed.
+    It's quite interesting that there were only 5 images in this interval. These can defnitely be considered as outliers.
+\end{itemize}
+
+Figure \ref{fig:occlusion_mosaic} provides simples for each interval. The above-presented findings will be tackled during in section \ref{sec:data-augmentation}.
 
 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.9\columnwidth]{figures/occlusion_distribution.pdf}
-    \caption{Distribution of occlusion across the training dataset.}
-    \label{fig:occlusion_distribution}  
+    \caption{Distribution of occlusion across the training database.}
+    \label{fig:train_occlusion_distribution}  
 \end{figure}
-
 
 \begin{figure}[ht]
     \centering
@@ -89,13 +99,24 @@ this learning could be useful if doing data augmentation.
     \label{fig:gender_distribution}
 \end{figure}
 
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{figures/hist_test_database.png}
+    \caption{Distribution of occlusion across the test database.}
+    \label{fig:test_occlusion_distribution}
+\end{figure}
+
 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.9\columnwidth]{figures/occlusion_mosaic.pdf}
-    \caption{Random samples for three occlusion intervals: Low $\in$ [0.0,0.3], Medium $\in$ [0.31,0.6] and High $\in$ [0.61, 1.0].}
+    \caption{Random samples for three occlusion intervals: Low $\in$ [0.1, 0.3], Medium $\in$ [0.31, 0.4] and High $\in$ [0.7, 1.0].}
     \label{fig:occlusion_mosaic}
 \end{figure}
+
+
+
+
 % ===================================================
 % --- Section
 % ===================================================
@@ -134,6 +155,8 @@ this learning could be useful if doing data augmentation.
 %Pour aligner notre modèle avec la métrique d'Idemia, nous avons implémenté une \textit{Weighted Mean Squared Error} (MSE). Les échantillons avec une forte occlusion vraie ($GT_i$) reçoivent un poids supérieur selon la formule $w_i = \frac{1}{30} + GT_i$.
 
 \subsection{Data augmentation}
+\label{sec:data-augmentation}
+Interesting fact, in most of the pictures the face covers most of the frame.
 %Afin d'atténuer le \textit{Domain Shift}, nous avons utilisé \texttt{RandomErasing} pour générer artificiellement des masques noirs aléatoires sur le set d'entraînement, forçant le modèle à traiter des cas d'occlusion extrêmes.
 
 
