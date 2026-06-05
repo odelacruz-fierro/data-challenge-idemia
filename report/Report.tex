@@ -68,22 +68,18 @@ The exploratory data analysis (EDA) performed on the train database revealed tha
 This is verified by Fig.\ref{fig:train_occlusion_distribution}, where we can observe a right-skewed distribution: the samples are more concentrated
 on the lower values than in the extreme high values, whici drag the tail towards the right side.
 
-From a gender perspective, it was found that the train database contains 67.6 \% of men and 32.4 \% of women (see Fig.\ref{fig:gender_distribution}).
-
-In order to understand what different occlusion levels looked-like, images were sampled out from the train database
-using different occlusion intervals, \textit{i.e.} $Low \in [0.1, 0.3]$, $Medium \in [0.31, 0.4]$ and $High \in [0.7, 1.0]$.
-These intervals were defined based on the test database occlusion distribution provided with the Data Challenge (see Fig.\ref{fig:test_occlusion_distribution}).
-The results of this sampling process allow to make some interesting observations:
+A closer look to different occlusion levels (see Table \ref{tab:occlusion_intervals}) allows us to notice that the majority of images concentrate
+in the occlusion interval $[0.0,0.5]$ with a minority of them in $(0.5,1.0]$. In order to understand what thes intervals looked-like, four
+occlusion levels were proposed: \textbf{low} $\in [0.0, 0.2]$, \textbf{medium-low} $\in (0.2, 0.4]$, \textbf{medium-high} $\in (0.4, 0.5]$ and
+\textbf{high} $\in (0.5, 1.0]$. Sample images for these intervals are provided in figure \ref{fig:occlusion_mosaic}.
+%
 
 \begin{itemize}
-    \item $low$ occluded images trend to provide a global visibility of the face forehead, eyes, nose, chicks and chin.
-    It's worth noting that the neck is not visible. 
-    \item in $medium$ occluded images par of the faces are covered either with the hair, a hat, hand, fingers and even physical objects.
-    \item  Finally in $high$ occluded images faces seem to be mostly visible, however a blurry / noised effect was noticed.
-    It's quite interesting that there were only 5 images in this interval. These can defnitely be considered as outliers.
+    \item \textbf{low} occluded images trend to provide a global visibility of the face forehead, eyes, nose, chicks and chin.
+    \item \textbf{medium-low} and \textbf{medium-high} occluded images par of the faces are covered either with the hair, a hat,
+    hand, fingers and even physical objects.
+    \item Finally in \textbf{high} occluded images faces seem to be mostly visible, however a blurry / noised effect was noticed. 
 \end{itemize}
-
-Figure \ref{fig:occlusion_mosaic} provides simples for each interval. The above-presented findings will be tackled during in section \ref{sec:data-augmentation}.
 
 
 \begin{figure}[ht]
@@ -93,6 +89,41 @@ Figure \ref{fig:occlusion_mosaic} provides simples for each interval. The above-
     \label{fig:train_occlusion_distribution}  
 \end{figure}
 
+
+\begin{table}[ht]
+\centering
+\caption{Distribution of images across occlusion intervals in the training database}
+\label{tab:occlusion_intervals}
+\begin{tabular}{lrc}
+\toprule
+\textbf{Occlusion interval} & \textbf{Image Count} & \textbf{(\%)} \\
+\midrule
+$[0.00, 0.10]$ & 68,929 & 68.93\% \\
+$(0.10, 0.20]$ & 19,558 & 19.56\% \\
+$(0.20, 0.30]$ &  8,372 &  8.37\% \\
+$(0.30, 0.40]$ &  2,865 &  2.86\% \\
+$(0.40, 0.50]$ &    240 &  0.24\% \\
+$(0.50, 0.60]$ &     26 &  0.03\% \\
+$(0.60, 0.70]$ &      5 &  0.01\% \\
+$(0.70, 0.80]$ &      2 &  0.00\% \\
+$(0.80, 0.90]$ &      0 &  0.00\% \\
+$(0.90, 1.00]$ &      3 &  0.00\% \\
+\midrule
+\textbf{Total} & \textbf{100,000} & \textbf{100.00\%} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{figures/occlusion_mosaic.pdf}
+    \caption{Random samples for four occlusion intervals.}
+    \label{fig:occlusion_mosaic}
+\end{figure}
+
+
+From a gender perspective, it was found that the train database contains 67.6 \% of men and 32.4 \% of women (see Fig.\ref{fig:gender_distribution}).
+
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.9\columnwidth]{figures/gender_distribution.pdf}
@@ -100,20 +131,7 @@ Figure \ref{fig:occlusion_mosaic} provides simples for each interval. The above-
     \label{fig:gender_distribution}
 \end{figure}
 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.9\columnwidth]{figures/hist_test_database.png}
-    \caption{Distribution of occlusion across the test database.}
-    \label{fig:test_occlusion_distribution}
-\end{figure}
 
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.9\columnwidth]{figures/occlusion_mosaic.pdf}
-    \caption{Random samples for three occlusion intervals: Low $\in$ [0.1, 0.3], Medium $\in$ [0.31, 0.4] and High $\in$ [0.7, 1.0].}
-    \label{fig:occlusion_mosaic}
-\end{figure}
 
 
 
@@ -149,35 +167,47 @@ Figure \ref{fig:occlusion_mosaic} provides simples for each interval. The above-
 \textit{TO DO ...}
 
 % ---------------------------------------------------
-% --- Subsection
+% --- Custom Loss
 % ---------------------------------------------------
 \subsection{Custom loss}
 \textit{TO DO ...}
 %Pour aligner notre modèle avec la métrique d'Idemia, nous avons implémenté une \textit{Weighted Mean Squared Error} (MSE). Les échantillons avec une forte occlusion vraie ($GT_i$) reçoivent un poids supérieur selon la formule $w_i = \frac{1}{30} + GT_i$.
 
+
+% ---------------------------------------------------
+% --- Data augmentation
+% ---------------------------------------------------
 \subsection{Data augmentation}
 \label{sec:data-augmentation}
 
-The goal of this section is to increase the diversity of the train database in order to match close enough
-the distribution of the test database. The results from the EDA in section \ref{sec:eda} showed that 
-in $medium$ occluded faces part of their faces are covered by some "object", \textit{i.e.} hair, hand, hat, etc.
-On the other hand, $high$ occluded images are mainly blurry / noised. In order to consider for these variations,
-to data augmentation strategies were considered: 1) kernel filtering and 2) random erasing.
-
 Often real-world data sets are predominately composed of ``normal'' examples with only a small percentage
-of ``abnormal'' or ``interesting'' examples.
+of ``abnormal'' or ``interesting'' examples. The goal of this section is to increase the diversity of the train database in order
+to match close enough the distribution of the test database (see Fig.\ref{fig:test_occlusion_distribution}).
 
-"Although predicting face occlusion is inherently a regression task, the extreme right-skew of the target
-distribution presents a continuous class imbalance problem. To address this, we employed techniques
-traditionally reserved for classification—specifically, target discretization to calculate inverse frequency
-weights for our data sampler..." 
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.9\columnwidth]{figures/hist_test_database.png}
+    \caption{Distribution of occlusion across the test database.}
+    \label{fig:test_occlusion_distribution}
+\end{figure}
+
+Visual analysis of the sampled intervals (see section \ref{sec:eda}) revealed a distinct dichotomy in the training data: true structural occlusions
+(e.g., hands, helmets, instruments, and hair) dominate the $[0.20, 0.50]$ range, whereas values above $0.50$ consist primarily
+of quality degradations such as severe sensor pixelation and artistic filter artifacts. Given that the target test distribution
+concentrates heavily below $0.50$, we prioritize \texttt{RandomErasing} as our primary spatial regularizer to simulate realistic
+object boundaries, treating \texttt{GaussianBlur} as a secondary augmentation to handle baseline quality invariance.
+
+%"Although predicting face occlusion is inherently a regression task, the extreme right-skew of the target
+%distribution presents a continuous class imbalance problem. To address this, we employed techniques
+%traditionally reserved for classification—specifically, target discretization to calculate inverse frequency
+%weights for our data sampler..." 
 
 Reference test \cite{xu_comprehensive_2023}
+
 Reference test \cite{chen_gridmask_2020}
+
 Reference test \cite{chawla_smote_2002}
-
-%Afin d'atténuer le \textit{Domain Shift}, nous avons utilisé \texttt{RandomErasing} pour générer artificiellement des masques noirs aléatoires sur le set d'entraînement, forçant le modèle à traiter des cas d'occlusion extrêmes.
-
 
 % ===================================================
 % --- Results
