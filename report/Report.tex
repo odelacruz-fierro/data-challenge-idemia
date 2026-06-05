@@ -164,6 +164,18 @@ in $medium$ occluded faces part of their faces are covered by some "object", \te
 On the other hand, $high$ occluded images are mainly blurry / noised. In order to consider for these variations,
 to data augmentation strategies were considered: 1) kernel filtering and 2) random erasing.
 
+Often real-world data sets are predominately composed of ``normal'' examples with only a small percentage
+of ``abnormal'' or ``interesting'' examples.
+
+"Although predicting face occlusion is inherently a regression task, the extreme right-skew of the target
+distribution presents a continuous class imbalance problem. To address this, we employed techniques
+traditionally reserved for classification—specifically, target discretization to calculate inverse frequency
+weights for our data sampler..." 
+
+Reference test \cite{xu_comprehensive_2023}
+Reference test \cite{chen_gridmask_2020}
+Reference test \cite{chawla_smote_2002}
+
 %Afin d'atténuer le \textit{Domain Shift}, nous avons utilisé \texttt{RandomErasing} pour générer artificiellement des masques noirs aléatoires sur le set d'entraînement, forçant le modèle à traiter des cas d'occlusion extrêmes.
 
 
@@ -212,5 +224,9 @@ to data augmentation strategies were considered: 1) kernel filtering and 2) rand
 % --- References ---
 % \bibliographystyle{plain}
 % \bibliography{references} % Uncomment if you use a .bib file
+% --- References ---
+\bibliographystyle{unsrt} 
+\bibliography{references}
+
 
 \end{document}

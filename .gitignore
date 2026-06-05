@@ -12,3 +12,5 @@ src/__pycache__/*
 *.synctex.gz
 *.fls
 task_brief.pdf
+*.bbl
+*.blg
