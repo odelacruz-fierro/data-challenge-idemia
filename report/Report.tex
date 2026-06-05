@@ -146,7 +146,24 @@ From a gender perspective, it was found that the train database contains 67.6 \%
 % --- Subsection
 % ---------------------------------------------------
 \subsection{Milti-Task Learning (MLT)}
-\textit{TO DO ...}
+
+Multi-task learning (MTL) is a model training technique where you train a single deep neural
+network on multiple tasks at the same time. 
+
+
+
+To optimize for both occlusion regression and demographic fairness, we implement a Multi-Task Learning (MTL) framework using a shared \texttt{MobileNetV3-Small} backbone. Unlike disjoint setups, our pipeline routes each batch simultaneously into two parallel heads: a regression head utilizing a \texttt{Sigmoid} activation for the \texttt{FaceOcclusion} score, and a linear classification head outputting raw logits for an auxiliary gender prediction task. The network is trained end-to-end by minimizing a joint loss function:
+
+\begin{equation}
+\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{occlusion}} + \gamma \cdot \mathcal{L}_{\text{gender}}
+\end{equation}
+
+where $\mathcal{L}_{\text{occlusion}}$ is the Mean Squared Error (MSE), $\mathcal{L}_{\text{gender}}$ is the Cross-Entropy Loss, and $\gamma = 0.1$ is a task-weighting scalar. This auxiliary head acts as a structural regularizer, forcing the shared layers to retain deep facial geometry and preventing the model from overfitting to superficial occlusion boundaries.
+
+
+\url{https://medium.com/gumgum-tech/an-easy-recipe-for-multi-task-learning-in-pytorch-that-you-can-do-at-home-1e529a8dfb7f}
+
+
 %Although the primary task is a simple regression (occlusion score), we opted for a two-head architecture. As demonstrated in the literature, the addition of an auxiliary task acts as a regularizer. The first head predicts the occlusion (via a Sigmoid activation), while the second predicts gender. This structure forces the shared feature extractor to focus on deep semantic facial features.
 
 
@@ -209,6 +226,7 @@ Reference test \cite{chen_gridmask_2020}
 
 Reference test \cite{chawla_smote_2002}
 
+Reference test \cite{caruana_multitask_1997}
 % ===================================================
 % --- Results
 % ===================================================

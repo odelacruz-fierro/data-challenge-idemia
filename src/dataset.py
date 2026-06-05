@@ -22,6 +22,7 @@ class Dataset(torch.utils.data.Dataset):
 
     def __getitem__(self, index):
         'Generates one sample of data'
+        
         # Select sample
         row = self.df.iloc[index]
         filename = row['filename']
