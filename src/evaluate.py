@@ -8,7 +8,7 @@ import pandas as pd
 
 def error_fn(df):
     pred = df.loc[:, "pred"]
-    ground_truth = df.loc[:, "target"]
+    ground_truth = df.loc[:, "target"]      # FaceOcclusion (label)
     weight = 1/30 + ground_truth
 
     return np.sum(((pred - ground_truth)**2) * weight, axis=0) / np.sum(weight, axis=0)
@@ -36,15 +36,17 @@ def evaluate_one_epoch(model, dataloader):
             y = y.to(config.DEVICE)
 
             # Prediction
-            y_pred = model(X)
+            #y_pred = model(X)
+            pred_occ, pred_gender = model(X)
+
+            pred_gender_class = pred_gender.argmax(dim=1)
 
             for i in range(len(X)):
-                results_list.append({
-                    'filename': filename[i],
-                    'pred': float(y_pred[i]),
-                    'target': float(y[i]),
-                    'gender': float(gender[i])
-                    })
+                results_list.append({'filename': filename[i],
+                                    'pred': float(pred_occ[i]),
+                                    'target': float(y[i]),
+                                    'gender': float(gender[i])
+                                    })
 
     # Convert to dataframe
     results_df = pd.DataFrame(results_list)
@@ -53,7 +55,7 @@ def evaluate_one_epoch(model, dataloader):
     results_male = results_df.loc[results_df["gender"] == 1.0]
     results_female = results_df.loc[results_df["gender"] == 0.0]
 
-    idemia_score = metric_fn(results_male, results_female)
+    idemia_score = metric_fn(results_female, results_male )
 
     return idemia_score, results_df
 

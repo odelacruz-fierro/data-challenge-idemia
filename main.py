@@ -1,9 +1,11 @@
 import pandas as pd
+
 from src import config
 from src import utils as tools
 from src import dataset
 from src import train
 from src import evaluate
+from src import model as mtl
 
 import torch
 import torch.nn as nn
@@ -76,12 +78,61 @@ def main():
     if config.USE_CUDA:
         torch.backends.cudnn.benchmark = True
 
-    model = torchvision.models.mobilenet_v3_small(num_classes=1)
-    model = model.to(config.DEVICE)
-    
+    #model = torchvision.models.mobilenet_v3_small(num_classes=1)
+    #model = model.to(config.DEVICE)
+
+    model = mtl.MultiTaskMobileNet().to(config.DEVICE)
+
     # Display model information
-    #print(model)
-    #tools.count_parameters(model)
+    if config.MODEL_INFO:
+        print(model)
+        tools.count_parameters(model)
+
+    # ------------------------------------------------------------
+    # Training + Evaluation
+    # ------------------------------------------------------------
+
+    # --- Loss function ---
+    criterion_occ = nn.MSELoss()
+    criterion_gender = nn.CrossEntropyLoss()
+
+    # --- Optimizer ---
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
+    for epoch in range(1, config.NUM_EPOCHS + 1):
+        
+        # Training
+        print("\nTRAINING started ...")
+        avg_train_loss = train.train_one_epoch(
+            model = model,
+            dataloader = training_generator,
+            optimizer = optimizer,
+            criterion_occ = criterion_occ,
+            criterion_gender = criterion_gender,
+            gamma_gender = config.GAMMA_GENDER,
+            epoch = epoch
+        )
+
+        print("\nEVALUATION started ...")
+        idemia_val_score, val_results_df = evaluate.evaluate_one_epoch(
+            model = model,
+            dataloader = validation_generator
+        )
+
+        '''
+        # Evaluation
+        print("\nEVALUATION started ...")
+        idemia_val_score, val_results_df = evaluate.evaluate_one_epoch(
+            model = model,
+            dataloader = validation_generator
+        )
+
+        print(f"End of epoch {epoch} | Average loss : {avg_train_loss}")
+        print(f"Train loss     : {avg_train_loss}")
+        print(f"Idemia score   : {idemia_val_score}")
+        '''
+
+    '''
 
     # Loss function
     loss_fn = nn.MSELoss()
@@ -115,6 +166,7 @@ def main():
         print(f"Train loss     : {avg_train_loss}")
         print(f"Idemia score   : {idemia_val_score}")
     
+    '''
 
 if __name__ == "__main__":
     main()

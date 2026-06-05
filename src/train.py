@@ -4,7 +4,7 @@ from src import config
 from tqdm import tqdm
 
 
-def train_one_epoch(model, dataloader, optimizer, loss_fn, epoch):
+def train_one_epoch(model, dataloader, optimizer, criterion_occ, criterion_gender, gamma_gender, epoch):
 
     # Activate training mode
     model.train()
@@ -18,30 +18,34 @@ def train_one_epoch(model, dataloader, optimizer, loss_fn, epoch):
         X = X.to(config.DEVICE)
         y = y.to(config.DEVICE)
         y = y.view(-1, 1)
+        gender = gender.to(config.DEVICE).long()
 
         # Reset gradients
         optimizer.zero_grad()
 
         # Forward pass
-        y_pred = model(X)
+        pred_occ, pred_gender = model(X)
 
         # Compute loss
-        loss = loss_fn(y_pred, y)
+        loss_occ = criterion_occ(pred_occ, y)
+        loss_gender = criterion_gender(pred_gender, gender)
 
-        if loss.isnan():
+        total_loss = loss_occ + gamma_gender*loss_gender
+
+        if loss_occ.isnan():
             print(filename)
             print('label', y)
-            print('y_pred', y_pred)
+            print('y_pred', pred_occ)
             break
         
         # Backpropagation
-        loss.backward()
+        total_loss.backward()
 
         # Update model weights
         optimizer.step()
 
-        current_loss += loss.item()
-        pbar.set_postfix({'Loss': f"{loss.item():.4f}"})
+        current_loss += total_loss.item()
+        pbar.set_postfix({'Loss': f"{total_loss.item():.4f}"})
 
     avg_loss = current_loss / len(dataloader)
 

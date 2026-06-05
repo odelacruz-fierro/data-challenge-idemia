@@ -14,6 +14,10 @@ DF_TRAIN = f"/{RAW_DATA_DIR}/train.csv"
 DF_TEST = f"/{RAW_DATA_DIR}/test_students.csv"
 IMAGE_TEST = f"/{IMAGE_DIR}/database1/img00000048.webp"
 
+
+# --- Display information ---
+MODEL_INFO = False
+
 # Data check
 DATA_CHECK = False
 
@@ -25,6 +29,7 @@ DEVICE = torch.device("cuda:0" if USE_CUDA else "cpu")
 # Training
 LEARNING_RATE = 0.001
 NUM_EPOCHS = 1
+GAMMA_GENDER = 0.1
 
 params_train = {'batch_size': 64,
           'shuffle': True,
