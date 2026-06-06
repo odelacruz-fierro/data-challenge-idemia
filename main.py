@@ -22,7 +22,7 @@ def main():
     print("# Welcome to Data IADATA704 data challenge pipeline")
     print("# Powered By Idemia and Télécom Paris")
     print("#")
-    print("# BY Oscar DE LA CRUZ")
+    print("# By Oscar DE LA CRUZ")
     print("#")
     print("#")
     print("*" * 60)
@@ -40,8 +40,8 @@ def main():
     df_test = df_test.dropna()
     
     # --- Data split ---
-    df_val = df_train.iloc[:20000].reset_index(drop = True)     # Validation
-    df_train = df_train.iloc[20000:].reset_index(drop = True)   # Train
+    df_val = df_train.iloc[:20000].reset_index(drop = True)     # 20% Validation
+    df_train = df_train.iloc[20000:].reset_index(drop = True)   # 80% Train
         
     # ------------------------------------------------------------
     # Data integrity check
@@ -51,12 +51,12 @@ def main():
         tools.check_images_integrity(df_train, config.IMAGE_DIR)
 
         print("\nChecking VALIDATION data integrity ...")
-        tools.check_images_integrity(df_val, config.IMAGE_DIR)
+        tools.check_imatraining_historyges_integrity(df_val, config.IMAGE_DIR)
 
         print("\nChecking TEST data integrity ...")
         tools.check_images_integrity(df_test, config.IMAGE_DIR)
     else:
-        print("\nDATA CHECK Disabled ... /!\\")
+        print("\nData check disabled ... /!\\ /!\\ /!\\")
 
     # ------------------------------------------------------------
     # Dataset and Dataloader
@@ -73,7 +73,7 @@ def main():
     # ------------------------------------------------------------
     # Model
     # ------------------------------------------------------------
-    print("\nBuilding MODEL ...")
+    print("\nBuilding Model ...")
 
     if config.USE_CUDA:
         torch.backends.cudnn.benchmark = True
@@ -97,13 +97,19 @@ def main():
     criterion_gender = nn.CrossEntropyLoss()
 
     # --- Optimizer ---
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr = config.LEARNING_RATE)
+
+    # --- Best score ---
+    best_score = float('inf')
+
+    # --- Data history ---
+    training_history = []
 
     for epoch in range(1, config.NUM_EPOCHS + 1):
         
-        # Training
-        print("\nTRAINING started ...")
-        avg_train_loss = train.train_one_epoch(
+        # --- Training ---
+        print(f"\n[Epoch {epoch}/{config.NUM_EPOCHS}] Training started ...\n")
+        train_metrics = train.train_one_epoch(
             model = model,
             dataloader = training_generator,
             optimizer = optimizer,
@@ -113,60 +119,35 @@ def main():
             epoch = epoch
         )
 
-        print("\nEVALUATION started ...")
+        # --- Validation ---
+        print("\nEvaluation on validation split started ...\n")
         idemia_val_score, val_results_df = evaluate.evaluate_one_epoch(
             model = model,
             dataloader = validation_generator
         )
 
-        '''
-        # Evaluation
-        print("\nEVALUATION started ...")
-        idemia_val_score, val_results_df = evaluate.evaluate_one_epoch(
-            model = model,
-            dataloader = validation_generator
-        )
+        # --- Epoch's data ---
+        training_history.append({
+            'epoch': epoch,
+            'train_loss_total': train_metrics['loss_total'],
+            'train_loss_occ': train_metrics['loss_occ'],
+            'train_loss_gender': train_metrics['loss_gender'],
+            'idemia_val_score': idemia_val_score
+        })
 
-        print(f"End of epoch {epoch} | Average loss : {avg_train_loss}")
-        print(f"Train loss     : {avg_train_loss}")
-        print(f"Idemia score   : {idemia_val_score}")
-        '''
+        if idemia_val_score < best_score:
+            print(f"\nNew best score! ({best_score:.4f} --> {idemia_val_score:.4f}). Saving model...")
+            torch.save(model.state_dict(), f"/{config.OUOTPUT_DIR}/best_model.pth")
+            
+            print(f"\nSaving validation_predictions.csv to =  {config.OUOTPUT_DIR}/")
+            val_results_df.to_csv(f"/{config.OUOTPUT_DIR}/best_validation_predictions.csv", sep=',', index=False)
 
-    '''
+            best_score = idemia_val_score
 
-    # Loss function
-    loss_fn = nn.MSELoss()
-
-    # Optimizer
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-
-    # ------------------------------------------------------------
-    # Training + Evaluation
-    # ------------------------------------------------------------
-    for epoch in range(1, config.NUM_EPOCHS + 1):
-        
-        # Training
-        print("\nTRAINING started ...")
-        avg_train_loss = train.train_one_epoch(
-            model = model,
-            dataloader = training_generator,
-            optimizer = optimizer,
-            loss_fn = loss_fn,
-            epoch = epoch
-        )
-
-        # Evaluation
-        print("\nEVALUATION started ...")
-        idemia_val_score, val_results_df = evaluate.evaluate_one_epoch(
-            model = model,
-            dataloader = validation_generator
-        )
-
-        print(f"End of epoch {epoch} | Average loss : {avg_train_loss}")
-        print(f"Train loss     : {avg_train_loss}")
-        print(f"Idemia score   : {idemia_val_score}")
-    
-    '''
+    # --- Export history ----
+    history_df = pd.DataFrame(training_history)
+    history_df.to_csv(f"/{config.OUOTPUT_DIR}/training_history.csv", sep=',', index=False)
+    print(f"\nTraining complete! ✅\n\nSaving training_history.csv to {config.OUOTPUT_DIR}/\n")
 
 if __name__ == "__main__":
     main()

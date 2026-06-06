@@ -5,11 +5,13 @@ from tqdm import tqdm
 
 
 def train_one_epoch(model, dataloader, optimizer, criterion_occ, criterion_gender, gamma_gender, epoch):
-
     # Activate training mode
     model.train()
 
-    current_loss = 0.0
+    # Loss trackers
+    running_total = 0.0
+    running_occ = 0.0
+    running_gender = 0.0
 
     pbar = tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Epoch {epoch}")
 
@@ -19,17 +21,12 @@ def train_one_epoch(model, dataloader, optimizer, criterion_occ, criterion_gende
         y = y.to(config.DEVICE)
         y = y.view(-1, 1)
         gender = gender.to(config.DEVICE).long()
-
-        # Reset gradients
-        optimizer.zero_grad()
-
         # Forward pass
         pred_occ, pred_gender = model(X)
 
         # Compute loss
         loss_occ = criterion_occ(pred_occ, y)
         loss_gender = criterion_gender(pred_gender, gender)
-
         total_loss = loss_occ + gamma_gender*loss_gender
 
         if loss_occ.isnan():
@@ -37,19 +34,28 @@ def train_one_epoch(model, dataloader, optimizer, criterion_occ, criterion_gende
             print('label', y)
             print('y_pred', pred_occ)
             break
-        
+
+        # Update loss trackers  
+        running_total += total_loss.item()
+        running_occ += loss_occ.item()
+        running_gender += loss_gender.item()
+
+        pbar.set_postfix({'Loss': f"{total_loss.item():.4f}"})
+
+        # Reset gradients
+        optimizer.zero_grad()
         # Backpropagation
         total_loss.backward()
-
         # Update model weights
         optimizer.step()
 
-        current_loss += total_loss.item()
-        pbar.set_postfix({'Loss': f"{total_loss.item():.4f}"})
+        train_metrics = {
+            'loss_total': running_total / len(dataloader),
+            'loss_occ': running_occ / len(dataloader),
+            'loss_gender': running_gender / len(dataloader)
+        }
 
-    avg_loss = current_loss / len(dataloader)
-
-    return avg_loss
+    return train_metrics
         
         
         
