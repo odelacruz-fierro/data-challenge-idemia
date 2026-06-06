@@ -13,15 +13,20 @@ def train_one_epoch(model, dataloader, optimizer, criterion_occ, criterion_gende
     running_occ = 0.0
     running_gender = 0.0
 
-    pbar = tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Epoch {epoch}")
+    pbar = tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Training-Epoch {epoch}")
 
     for batch_idx, (X, y, gender, filename) in pbar:
-        # Transfert to GPU
+
+        # --- Transfert to GPU ---
         X = X.to(config.DEVICE)
         y = y.to(config.DEVICE)
         y = y.view(-1, 1)
         gender = gender.to(config.DEVICE).long()
-        # Forward pass
+
+        # Reset gradients
+        optimizer.zero_grad()
+
+        # --- Forward pass ---
         pred_occ, pred_gender = model(X)
 
         # Compute loss
@@ -41,19 +46,17 @@ def train_one_epoch(model, dataloader, optimizer, criterion_occ, criterion_gende
         running_gender += loss_gender.item()
 
         pbar.set_postfix({'Loss': f"{total_loss.item():.4f}"})
-
-        # Reset gradients
-        optimizer.zero_grad()
+        
         # Backpropagation
         total_loss.backward()
         # Update model weights
         optimizer.step()
 
-        train_metrics = {
-            'loss_total': running_total / len(dataloader),
-            'loss_occ': running_occ / len(dataloader),
-            'loss_gender': running_gender / len(dataloader)
-        }
+    train_metrics = {
+        'loss_total': running_total / len(dataloader),
+        'loss_occ': running_occ / len(dataloader),
+        'loss_gender': running_gender / len(dataloader)
+    }
 
     return train_metrics
         

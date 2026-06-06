@@ -19,35 +19,64 @@ def metric_fn(female, male):
     return (err_male + err_female) / 2 + abs(err_male - err_female)
 
 
-def evaluate_one_epoch(model, dataloader):
-
+def validation_one_epoch(model, dataloader, criterion_occ, criterion_gender, gamma_gender, epoch):
     # Activate evaluation mode
     model.eval()
 
-    results_list = [] 
-       
-    if dataloader.dataset.training:
+    # Loss trackers
+    running_total = 0.0
+    running_occ = 0.0
+    running_gender = 0.0
 
-        with torch.inference_mode():  
+    results_list = []    
 
-            pbar = tqdm(enumerate(dataloader), total=len(dataloader), desc="Validation")
-            
-            for batch_idx, (X, y, gender, filename) in pbar:
-                X = X.to(config.DEVICE)
-                y = y.to(config.DEVICE)
+    with torch.inference_mode():
 
-                # --- Forward pass ---
-                pred_occ, pred_gender = model(X)                # Occlusion
-                pred_gender_class = pred_gender.argmax(dim=1)   # Gender
-                
-                # --- Gather outputs ---
-                for i in range(len(X)):
-                    results_list.append({'filename': filename[i],
-                                        'pred': float(pred_occ[i]),
-                                        'target': float(y[i]),
-                                        'gender': float(gender[i])
-                                        })    
+        pbar = tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Validation-Epoch {epoch}")
         
+        for batch_idx, (X, y, gender, filename) in pbar:
+
+            # --- Transfert to GPU ---
+            X = X.to(config.DEVICE)
+            y = y.to(config.DEVICE)
+            y = y.view(-1, 1)
+            gender = gender.to(config.DEVICE).long()
+
+            # --- Forward pass ---
+            pred_occ, pred_gender = model(X)                # Occlusion
+            pred_gender_class = pred_gender.argmax(dim=1)   # Gender
+
+            # --- Compute loss ---
+            loss_occ = criterion_occ(pred_occ, y)
+            loss_gender = criterion_gender(pred_gender, gender)
+            total_loss = loss_occ + gamma_gender*loss_gender
+
+            # --- Update loss trackers ---
+            running_total += total_loss.item()
+            running_occ += loss_occ.item()
+            running_gender += loss_gender.item()
+
+            # --- Move batch to cpu ---
+            pred_occ_cpu = pred_occ.detach().cpu()
+            y_cpu = y.detach().cpu()
+            gender_cpu = gender.detach().cpu()
+            pred_gender_class_cpu = pred_gender_class.detach().cpu()
+            
+            # --- Gather outputs ---
+            for i in range(len(X)):
+                results_list.append({
+                    'filename': filename[i],
+                    'pred': pred_occ_cpu[i].item(),
+                    'target': y_cpu[i].item(),
+                    'gender': gender_cpu[i].item(),
+                    'gender_pred': float(pred_gender_class_cpu[i].item())
+                })   
+        
+        validation_metrics = {
+            'loss_total': running_total / len(dataloader),
+            'loss_occ': running_occ / len(dataloader),
+            'loss_gender': running_gender / len(dataloader)
+        }
 
         # --- Convert to dataframe ---
         results_df = pd.DataFrame(results_list)
@@ -55,11 +84,9 @@ def evaluate_one_epoch(model, dataloader):
         # --- Compute Idemia score ---
         results_male = results_df.loc[results_df["gender"] == 1.0]
         results_female = results_df.loc[results_df["gender"] == 0.0]
+        idemia_score = metric_fn(results_female, results_male)        
 
-        idemia_score = metric_fn(results_female, results_male )
-        results_df['idemia_score'] = idemia_score        
-
-        return idemia_score, results_df
+        return idemia_score, results_df, validation_metrics
 
 
 if __name__ == "__main__":

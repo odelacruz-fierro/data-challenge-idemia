@@ -37,7 +37,7 @@ DEVICE = torch.device("cuda:0" if USE_CUDA else "cpu")
 
 # Training
 LEARNING_RATE = 0.001
-NUM_EPOCHS = 1
+NUM_EPOCHS = 10
 GAMMA_GENDER = 0.1
 
 params_train = {'batch_size': 64,
@@ -77,8 +77,7 @@ if __name__ == "__main__":
 
     files = [DF_TRAIN,
             DF_TEST,
-            IMAGE_TEST,
-            PHOTO]
+            IMAGE_TEST]
 
     for file in files:
         if os.path.exists(file):

@@ -121,18 +121,26 @@ def main():
 
         # --- Validation ---
         print("\nEvaluation on validation split started ...\n")
-        idemia_val_score, val_results_df = evaluate.evaluate_one_epoch(
+        idemia_val_score, val_results_df, val_metrics = evaluate.validation_one_epoch(
             model = model,
-            dataloader = validation_generator
+            dataloader = validation_generator,
+            criterion_occ = criterion_occ,
+            criterion_gender = criterion_gender,
+            gamma_gender = config.GAMMA_GENDER,
+            epoch = epoch
         )
 
         # --- Epoch's data ---
         training_history.append({
             'epoch': epoch,
+            'gamma_gender':config.GAMMA_GENDER, 
+            'idemia_val_score': idemia_val_score,
             'train_loss_total': train_metrics['loss_total'],
             'train_loss_occ': train_metrics['loss_occ'],
             'train_loss_gender': train_metrics['loss_gender'],
-            'idemia_val_score': idemia_val_score
+            'val_loss_total': val_metrics['loss_total'],
+            'val_loss_occ': val_metrics['loss_occ'],
+            'val_loss_gender': val_metrics['loss_gender'] 
         })
 
         if idemia_val_score < best_score:
