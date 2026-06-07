@@ -22,7 +22,7 @@ def main():
     print("*" * 60)
     print("#")
     print("#")    
-    print("# Welcome to Data IADATA704 data challenge pipeline")
+    print("# Welcome to Data IADATA704 data challenge TRAIN and VALIDATION pipeline")
     print("# Powered By Idemia and Télécom Paris")
     print("#")
     print("# By Oscar DE LA CRUZ")
@@ -36,11 +36,9 @@ def main():
     # Datasets
     # ------------------------------------------------------------
     df_train = pd.read_csv(config.DF_TRAIN, delimiter=',')
-    df_test = pd.read_csv(config.DF_TEST, delimiter=',')
 
     # --- Remove nan values ---
     df_train = df_train.dropna()
-    df_test = df_test.dropna()
     
     # --- Data split ---
     df_val = df_train.iloc[:20000].reset_index(drop = True)     # 20% Validation
@@ -55,9 +53,6 @@ def main():
 
         print("\nChecking VALIDATION data integrity ...")
         tools.check_imatraining_historyges_integrity(df_val, config.IMAGE_DIR)
-
-        print("\nChecking TEST data integrity ...")
-        tools.check_images_integrity(df_test, config.IMAGE_DIR)
     else:
         print("\nData check disabled ... /!\\ /!\\ /!\\")
 
