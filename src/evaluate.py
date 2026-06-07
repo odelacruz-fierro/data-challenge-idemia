@@ -69,7 +69,7 @@ def validation_one_epoch(model, dataloader, criterion_occ, criterion_gender, gam
                     'pred': pred_occ_cpu[i].item(),
                     'target': y_cpu[i].item(),
                     'gender': gender_cpu[i].item(),
-                    'gender_pred': float(pred_gender_class_cpu[i].item())
+                    'gender_pred': int(pred_gender_class_cpu[i].item())
                 })   
         
         validation_metrics = {

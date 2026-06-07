@@ -11,12 +11,15 @@ PROJECT_DIR = PROJECT_DIR[1:]       # Removed "/" at index 0 for clarity
 DATA_DIR = "data"
 RAW_DATA_DIR = f"{PROJECT_DIR}/{DATA_DIR}"
 IMAGE_DIR = f"{RAW_DATA_DIR}/crops/Crop_224_5fp_100K"
+OUOTPUT_DIR = f"{PROJECT_DIR}/outputs"
 
 # --- Data files ---
 DF_TRAIN = f"/{RAW_DATA_DIR}/occlusion_datasets/train.csv"
 DF_TEST = f"/{RAW_DATA_DIR}/occlusion_datasets/test_students.csv"
 IMAGE_TEST = f"/{IMAGE_DIR}/database1/img00000048.webp"
 
+VAL_PREDICTIONS = f"/{OUOTPUT_DIR}/best_validation_predictions.csv"
+TRAIN_HISTORY = f"/{OUOTPUT_DIR}/training_history.csv"
 
 # ======================================================
 # Data processing
@@ -38,7 +41,9 @@ DEVICE = torch.device("cuda:0" if USE_CUDA else "cpu")
 # Training
 LEARNING_RATE = 0.001
 NUM_EPOCHS = 10
+
 GAMMA_GENDER = 0.1
+#GAMMA_GENDER = 0.024
 
 params_train = {'batch_size': 64,
           'shuffle': True,
@@ -61,7 +66,7 @@ MODEL_INFO = False
 # Outputs
 # ======================================================
 
-OUOTPUT_DIR = f"{PROJECT_DIR}/outputs"
+
 
 VALIDATION_RESULTS = True
 TEST_RESULTS = False
@@ -77,7 +82,9 @@ if __name__ == "__main__":
 
     files = [DF_TRAIN,
             DF_TEST,
-            IMAGE_TEST]
+            IMAGE_TEST,
+            VAL_PREDICTIONS,
+            TRAIN_HISTORY]
 
     for file in files:
         if os.path.exists(file):

@@ -109,6 +109,7 @@ def main():
         
         # --- Training ---
         print(f"\n[Epoch {epoch}/{config.NUM_EPOCHS}] Training started ...\n")
+
         train_metrics = train.train_one_epoch(
             model = model,
             dataloader = training_generator,
@@ -121,6 +122,7 @@ def main():
 
         # --- Validation ---
         print("\nEvaluation on validation split started ...\n")
+        
         idemia_val_score, val_results_df, val_metrics = evaluate.validation_one_epoch(
             model = model,
             dataloader = validation_generator,
