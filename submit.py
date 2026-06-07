@@ -112,7 +112,7 @@ def main():
 
     # --- Export predictions ---
     results_df['gender'] = 'x'
-    results_df.to_csv(f"/{config.OUOTPUT_DIR}/test_predictions.csv", sep=',', index=False)
+    results_df.to_csv(f"/{config.OUOTPUT_DIR}/{EXPERIMENTS[selected_model - 1]}/test_predictions.csv", sep=',', index=False)
  
 
 if __name__ == "__main__":
