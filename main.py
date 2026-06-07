@@ -6,9 +6,12 @@ from src import dataset
 from src import train
 from src import evaluate
 from src import model as mtl
+from torch.utils.data import WeightedRandomSampler
+
 
 import torch
 import torch.nn as nn
+
 
 import torchvision
 #from torchvision.models import mobilenet_v3_small
@@ -65,8 +68,35 @@ def main():
     validation_set = dataset.Dataset(df_val, config.IMAGE_DIR)
     test_set = dataset.Dataset(df_test, config.IMAGE_DIR, training=False)
 
+
+    # --- Gender weights computation ---
+    female_count = len(df_train[df_train['gender'] == 0.0])
+    male_count = len(df_train[df_train['gender'] == 1.0])
+
+    print(f"\n-> Females: {female_count}, Males: {male_count}")
+
+    class_weights = {
+        0.0: 1.0 / female_count,
+        1.0: 1.0 / male_count
+    }
+
+    sample_weights = [class_weights[g] for g in df_train['gender']]
+    sample_weights_tensor = torch.DoubleTensor(sample_weights)
+
+    # 4. Create the Sampler
+    sampler = WeightedRandomSampler(
+        weights=sample_weights_tensor,
+        num_samples=len(sample_weights_tensor),
+        replacement=True 
+    )
+
     print("\nCreating dataloaders ...")
-    training_generator = torch.utils.data.DataLoader(training_set, **config.params_train)
+    training_generator = torch.utils.data.DataLoader(training_set,
+                                                     batch_size = config.params_train['batch_size'],
+                                                     sampler = sampler,
+                                                     shuffle = config.params_train['shuffle'],
+                                                     num_workers = config.params_train['num_workers'])
+    
     validation_generator = torch.utils.data.DataLoader(validation_set, **config.params_val)
     test_generator = torch.utils.data.DataLoader(test_set, **config.params_val)
 

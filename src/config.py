@@ -42,11 +42,14 @@ DEVICE = torch.device("cuda:0" if USE_CUDA else "cpu")
 LEARNING_RATE = 0.001
 NUM_EPOCHS = 10
 
-GAMMA_GENDER = 0.1
+#GAMMA_GENDER = 0.1
 #GAMMA_GENDER = 0.024
+GAMMA_GENDER = 0.015
+
+
 
 params_train = {'batch_size': 64,
-          'shuffle': True,
+          'shuffle': False,         # Set to False to use WeightedRandomSampler
           'num_workers': 4}
 
 params_val = {'batch_size': 64,
