@@ -47,6 +47,13 @@ NUM_EPOCHS = 10
 GAMMA_GENDER = 0.015
 
 
+# Data augmentation
+SCALE = [0.08, 0.15]
+RATIO = [0.25, 0.7]
+TRANSFORM_PROB = 1.0
+
+
+
 
 params_train = {'batch_size': 64,
           'shuffle': False,         # Set to False to use WeightedRandomSampler

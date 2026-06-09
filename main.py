@@ -7,6 +7,7 @@ from src import train
 from src import evaluate
 from src import model as mtl
 from torch.utils.data import WeightedRandomSampler
+import torchvision.transforms as T
 
 
 import torch
@@ -32,6 +33,34 @@ def main():
 
     print(f"Loading data from: {config.RAW_DATA_DIR}")
     
+
+    # ------------------------------------------------------------
+    # Transformation pipelines
+    # ------------------------------------------------------------
+
+    train_transforms = T.Compose([
+        T.Resize((224, 224)), 
+        
+        # Apply Blur
+        #T.GaussianBlur(kernel_size=(5, 5), sigma=(0.1, 2.0)),
+        
+        # Convert to Tensor (Required for Random Erasing)
+        T.ToTensor(),        
+        
+        # scale => The Total Area (Size)
+        # ratio => The Aspect Ratio (Shape) = Height / Width
+        T.RandomErasing(p=config.TRANSFORM_PROB, scale=(config.SCALE[0], config.SCALE[1]), ratio=(config.RATIO[0], config.RATIO[1]), value=0),
+        
+        # From ImageNet
+        T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
+
+    val_transforms = T.Compose([
+        T.Resize((224, 224)),
+        T.ToTensor(),
+        T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
+
     # ------------------------------------------------------------
     # Datasets
     # ------------------------------------------------------------
@@ -52,17 +81,15 @@ def main():
         tools.check_images_integrity(df_train, config.IMAGE_DIR)
 
         print("\nChecking VALIDATION data integrity ...")
-        tools.check_imatraining_historyges_integrity(df_val, config.IMAGE_DIR)
+        tools.check_images_integrity(df_val, config.IMAGE_DIR)
     else:
         print("\nData check disabled ... /!\\ /!\\ /!\\")
 
     # ------------------------------------------------------------
     # Dataset and Dataloader
     # ------------------------------------------------------------
-    training_set = dataset.Dataset(df_train, config.IMAGE_DIR)
-    validation_set = dataset.Dataset(df_val, config.IMAGE_DIR)
-    test_set = dataset.Dataset(df_test, config.IMAGE_DIR, training=False)
-
+    training_set = dataset.Dataset(df_train, config.IMAGE_DIR, training =  True, transforms = train_transforms)
+    validation_set = dataset.Dataset(df_val, config.IMAGE_DIR, training = True, transform = val_transforms)  
 
     # --- Gender weights computation ---
     female_count = len(df_train[df_train['gender'] == 0.0])
@@ -89,11 +116,10 @@ def main():
     training_generator = torch.utils.data.DataLoader(training_set,
                                                      batch_size = config.params_train['batch_size'],
                                                      sampler = sampler,
-                                                     shuffle = config.params_train['shuffle'],
+                                                     #shuffle = config.params_train['shuffle'],
                                                      num_workers = config.params_train['num_workers'])
     
-    validation_generator = torch.utils.data.DataLoader(validation_set, **config.params_val)
-    test_generator = torch.utils.data.DataLoader(test_set, **config.params_val)
+    validation_generator = torch.utils.data.DataLoader(validation_set, **config.params_val)    
 
     # ------------------------------------------------------------
     # Model

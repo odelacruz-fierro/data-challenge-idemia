@@ -9,12 +9,13 @@ from src import config
 
 class Dataset(torch.utils.data.Dataset):
     'Characterizes a dataset for PyTorch'
-    def __init__(self, df, image_dir, training=True):
+    def __init__(self, df, image_dir, training=True, transform = None):
          'Initialization'
          self.training = training
          self.image_dir = image_dir
          self.df = df
-         self.transform = transforms.ToTensor()
+         #self.transform = transforms.ToTensor()
+         self.transform = transform
          
     def __len__(self):
         'Denotes the total number of samples'
@@ -31,7 +32,12 @@ class Dataset(torch.utils.data.Dataset):
         img = Image.open(f"/{self.image_dir}/{filename}")
 
         # Converts image into a PyTorch tensor
-        X = self.transform(img)
+        #X = self.transform(img)
+
+        if self.transform:
+            X = self.transform(img)
+        else:
+            X = transforms.ToTensor()(img)            
 
         if self.training:
             y = row['FaceOcclusion']
