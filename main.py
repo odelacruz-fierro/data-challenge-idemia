@@ -42,7 +42,7 @@ def main():
         T.Resize((224, 224)), 
         
         # Apply Blur
-        #T.GaussianBlur(kernel_size=(5, 5), sigma=(0.1, 2.0)),
+        T.GaussianBlur(kernel_size=(5, 5), sigma=(0.1, 2.0)),
         
         # Convert to Tensor (Required for Random Erasing)
         T.ToTensor(),        
@@ -88,7 +88,7 @@ def main():
     # ------------------------------------------------------------
     # Dataset and Dataloader
     # ------------------------------------------------------------
-    training_set = dataset.Dataset(df_train, config.IMAGE_DIR, training =  True, transforms = train_transforms)
+    training_set = dataset.Dataset(df_train, config.IMAGE_DIR, training =  True, transform = train_transforms)
     validation_set = dataset.Dataset(df_val, config.IMAGE_DIR, training = True, transform = val_transforms)  
 
     # --- Gender weights computation ---

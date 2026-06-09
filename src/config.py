@@ -48,9 +48,13 @@ GAMMA_GENDER = 0.015
 
 
 # Data augmentation
-SCALE = [0.08, 0.15]
+#SCALE = [0.08, 0.15]
+SCALE = [0.02, 0.10] # Ancien : [0.08, 0.15]
+
 RATIO = [0.25, 0.7]
-TRANSFORM_PROB = 1.0
+
+#TRANSFORM_PROB = 0.5
+TRANSFORM_PROB = 0.30 # Ancien : 0.5
 
 
 
