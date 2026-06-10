@@ -37,12 +37,12 @@ def main():
     # ------------------------------------------------------------
     # Transformation pipelines
     # ------------------------------------------------------------
-
+    
     train_transforms = T.Compose([
         T.Resize((224, 224)), 
         
         # Apply Blur
-        T.GaussianBlur(kernel_size=(5, 5), sigma=(0.1, 2.0)),
+        T.GaussianBlur(kernel_size=(config.KERNEL_SZ[0], config.KERNEL_SZ[1]), sigma=(config.SIGMA[0], config.SIGMA[1])),
         
         # Convert to Tensor (Required for Random Erasing)
         T.ToTensor(),        
@@ -54,6 +54,33 @@ def main():
         # From ImageNet
         T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
+    
+    '''
+    train_transforms = T.Compose([
+        # 1. Simule les visages excentrés/coupés (Intervals 2 & 3 -> 0.40, 0.41)
+        # On ne crop que très peu (max 15%) pour rester dans les clous du dataset
+        T.RandomResizedCrop(size=(224, 224), scale=(0.85, 1.0), ratio=(0.95, 1.05)),
+        
+        # 2. Simule les inclinaisons de tête (Interval 3 -> 0.46, Interval 4 -> 0.54)
+        T.RandomRotation(degrees=15),
+        
+        # 3. Simule les ombres massives et contrastes (Interval 3 -> Trumpet, Interval 4 -> 0.71)
+        T.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.1, hue=0.0),
+        
+        # 4. Augmentations géométriques et flou standards
+        T.RandomHorizontalFlip(p=0.5),
+        T.GaussianBlur(kernel_size=(5, 5), sigma=(0.1, 1.5)),
+        
+        # 5. Passage en tenseur
+        T.ToTensor(),        
+        
+        # 6. Injection des mini-rectangles noirs
+        T.RandomErasing(p=config.TRANSFORM_PROB, scale=(config.SCALE[0], config.SCALE[1]), ratio=(config.RATIO[0], config.RATIO[1]), value=0),
+        
+        # 7. Normalisation ImageNet finale pour ton ResNet50
+        T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
+    '''
 
     val_transforms = T.Compose([
         T.Resize((224, 224)),
@@ -148,7 +175,13 @@ def main():
     criterion_gender = nn.CrossEntropyLoss()
 
     # --- Optimizer ---
-    optimizer = torch.optim.Adam(model.parameters(), lr = config.LEARNING_RATE)
+    # optimizer = torch.optim.Adam(model.parameters(), lr = config.LEARNING_RATE)
+
+    optimizer = torch.optim.AdamW(
+        model.parameters(), 
+        lr = config.LEARNING_RATE,
+        weight_decay = 1e-4  # Standard value for regularization
+    )
 
     # --- Best score ---
     best_score = float('inf')
@@ -197,7 +230,7 @@ def main():
         })
 
         if idemia_val_score < best_score:
-            print(f"\nNew best score! ({best_score:.4f} --> {idemia_val_score:.4f}). Saving model...")
+            print(f"\n🔥🔥🔥New best score! ({best_score:.4f} --> {idemia_val_score:.4f}). Saving model...🔥🔥🔥")
             torch.save(model.state_dict(), f"/{config.OUOTPUT_DIR}/best_model.pth")
             
             print(f"\nSaving validation_predictions.csv to =  {config.OUOTPUT_DIR}/")

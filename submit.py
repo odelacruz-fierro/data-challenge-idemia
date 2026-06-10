@@ -9,6 +9,7 @@ from src import train
 from src import evaluate
 from src import model as mtl
 from torch.utils.data import WeightedRandomSampler
+import torchvision.transforms as T
 
 
 import torch
@@ -35,6 +36,12 @@ def main():
 
     print(f"Loading data from: {config.RAW_DATA_DIR}")
     
+    val_transforms = T.Compose([
+        T.Resize((224, 224)),
+        T.ToTensor(),
+        T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
+
     # ------------------------------------------------------------
     # Datasets
     # ------------------------------------------------------------
@@ -52,7 +59,8 @@ def main():
     # ------------------------------------------------------------
     # Dataset and Dataloader
     # ------------------------------------------------------------
-    test_set = dataset.Dataset(df_test, config.IMAGE_DIR, training=False)
+    test_set = dataset.Dataset(df_test, config.IMAGE_DIR, training=False, transform=val_transforms)
+    #test_set = dataset.Dataset(df_test, config.IMAGE_DIR, training=False)
     test_generator = torch.utils.data.DataLoader(test_set, **config.params_val)
 
     # ------------------------------------------------------------

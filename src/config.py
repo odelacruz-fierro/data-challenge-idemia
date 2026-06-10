@@ -40,24 +40,23 @@ DEVICE = torch.device("cuda:0" if USE_CUDA else "cpu")
 
 # Training
 LEARNING_RATE = 0.001
-NUM_EPOCHS = 10
+NUM_EPOCHS = 50
 
 #GAMMA_GENDER = 0.1
 #GAMMA_GENDER = 0.024
 GAMMA_GENDER = 0.015
 
 
-# Data augmentation
-#SCALE = [0.08, 0.15]
-SCALE = [0.02, 0.10] # Ancien : [0.08, 0.15]
+# --- Data augmentation ---
 
+# Random erasing
+SCALE = [0.02, 0.10]
 RATIO = [0.25, 0.7]
+TRANSFORM_PROB = 0.30
 
-#TRANSFORM_PROB = 0.5
-TRANSFORM_PROB = 0.30 # Ancien : 0.5
-
-
-
+# Gaussian blurr
+SIGMA = [0.1, 2.0]
+KERNEL_SZ = [5,5]
 
 params_train = {'batch_size': 64,
           'shuffle': False,         # Set to False to use WeightedRandomSampler
