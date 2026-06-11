@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH --job-name=datachallenge704-run001
+#SBATCH --job-name=test-idemia
 #SBATCH --output=slurm-%x_%j.out
 #SBATCH --error=slurm-%x_%j.err
-#SBATCH --partition=P100
+#SBATCH --partition=3090
 #SBATCH --gres=gpu:1
-#SBATCH --cpus-per-task=8
-#SBATCH --mem=30G
-#SBATCH --time=30:00:00
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=16G
+#SBATCH --time=00:15:00
 
 # Data Challenge 704 - Model Training Script
 # Adapted for local environment
