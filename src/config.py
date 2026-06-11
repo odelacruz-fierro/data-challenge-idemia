@@ -6,8 +6,10 @@ import torch
 # ======================================================
 
 # --- Main directories ---
-PROJECT_DIR = os.getcwd()           # Retrieve current directory
-PROJECT_DIR = PROJECT_DIR[1:]       # Removed "/" at index 0 for clarity
+#PROJECT_DIR = os.getcwd()           # Retrieve current directory
+#PROJECT_DIR = PROJECT_DIR[1:]       # Removed "/" at index 0 for clarity
+PROJECT_DIR = "home/infres/odelacruz-25/data-challenge-idemia"
+
 DATA_DIR = "data"
 RAW_DATA_DIR = f"{PROJECT_DIR}/{DATA_DIR}"
 IMAGE_DIR = f"{RAW_DATA_DIR}/crops/Crop_224_5fp_100K"
