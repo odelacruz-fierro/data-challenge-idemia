@@ -63,8 +63,6 @@ class MultiTaskResNet50(nn.Module):
 
         # Load backbone architecture + weights (ImageNet)
         self.backbone = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
-
-        print(self.backbone)
         
         # Size of the features entering the final layer (in_features=2048)
         in_features = self.backbone.fc.in_features
@@ -103,4 +101,4 @@ if __name__ == "__main__":
     
     model = mtl.MultiTaskResNet50().to(config.DEVICE)
 
-    print(model)
+    #print(model)
