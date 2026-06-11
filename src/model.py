@@ -1,6 +1,14 @@
 import torch.nn as nn
 import torchvision.models as models
+import torch
 
+from src import config
+from src import model as mtl
+
+
+# ==============================================================================
+# MobileNet V3 Small
+# ==============================================================================
 
 class MultiTaskMobileNet(nn.Module):
 
@@ -43,7 +51,43 @@ class MultiTaskMobileNet(nn.Module):
         # Gender prediction
         gender_pred = self.gender_head(features)
         
-        return occlusion_pred, gender_pred    
+        return occlusion_pred, gender_pred
+
+
+# ==============================================================================
+# ResNet-50
+# ==============================================================================
+class MultiTaskResNet50(nn.Module):
+    def __init__(self):
+        super(MultiTaskResNet50, self).__init__()
+
+        # Load backbone architecture + weights (ImageNet)
+        self.backbone = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
+
+        print(self.backbone)
+        
+        # Size of the features entering the final layer (in_features=2048)
+        in_features = self.backbone.fc.in_features
+        
+        # Remove final classification layer by replacing it with Identity
+        self.backbone.fc = nn.Identity()
+        
+        # --- Define occlusion head ---
+        self.occlusion_head = nn.Sequential(
+            nn.Linear(in_features, 1),
+            nn.Sigmoid()
+        )
+
+        # --- Define gender head ---        
+        self.gender_head = nn.Sequential(
+            nn.Linear(in_features, 2)
+        )
+        
+    def forward(self, x):
+        features = self.backbone(x)
+        occlusion_pred = self.occlusion_head(features)
+        gender_pred = self.gender_head(features)
+        return occlusion_pred, gender_pred
 
 
 if __name__ == "__main__":
@@ -51,3 +95,12 @@ if __name__ == "__main__":
     print("*****************************************************")
     print("model.py")
     print("*****************************************************")
+
+    print("\nBuilding Model (ResNet-50 Multi-Task) ...")
+
+    if config.USE_CUDA:
+        torch.backends.cudnn.benchmark = True
+    
+    model = mtl.MultiTaskResNet50().to(config.DEVICE)
+
+    print(model)

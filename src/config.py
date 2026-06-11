@@ -6,8 +6,12 @@ import torch
 # ======================================================
 
 # --- Main directories ---
+
+# --- Local ---
 #PROJECT_DIR = os.getcwd()           # Retrieve current directory
 #PROJECT_DIR = PROJECT_DIR[1:]       # Removed "/" at index 0 for clarity
+
+# --- Telecom Cluster ---
 PROJECT_DIR = "home/infres/odelacruz-25/data-challenge-idemia"
 
 DATA_DIR = "data"
@@ -42,7 +46,7 @@ DEVICE = torch.device("cuda:0" if USE_CUDA else "cpu")
 
 # Training
 LEARNING_RATE = 0.001
-NUM_EPOCHS = 2
+NUM_EPOCHS = 50
 
 #GAMMA_GENDER = 0.1
 #GAMMA_GENDER = 0.024

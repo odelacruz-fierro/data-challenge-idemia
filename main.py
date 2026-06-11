@@ -159,7 +159,9 @@ def main():
     #model = torchvision.models.mobilenet_v3_small(num_classes=1)
     #model = model.to(config.DEVICE)
 
-    model = mtl.MultiTaskMobileNet().to(config.DEVICE)
+    #model = mtl.MultiTaskMobileNet().to(config.DEVICE)
+
+    model = mtl.MultiTaskResNet50().to(config.DEVICE)
 
     # Display model information
     if config.MODEL_INFO:

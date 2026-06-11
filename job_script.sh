@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH --job-name=test-idemia
+#SBATCH --job-name=resnet50-idemia
 #SBATCH --output=slurm-%x_%j.out
 #SBATCH --error=slurm-%x_%j.err
 #SBATCH --partition=3090
 #SBATCH --gres=gpu:1
-#SBATCH --cpus-per-task=4
-#SBATCH --mem=16G
-#SBATCH --time=00:15:00
+#SBATCH --cpus-per-task=8
+#SBATCH --mem=30G
+#SBATCH --time=20:00:00
 
 # Data Challenge 704 - Model Training Script
 # Adapted for local environment
