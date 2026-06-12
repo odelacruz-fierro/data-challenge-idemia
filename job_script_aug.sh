@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=resnet50-run14
+#SBATCH --job-name=resnet50-run15
 #SBATCH --output=slurm-%x_%j.out
 #SBATCH --error=slurm-%x_%j.err
 #SBATCH --partition=3090
@@ -27,7 +27,7 @@ echo "==========================================================================
 # Project configuration
 PROJECT_DIR="/home/infres/${USER}/data-challenge-idemia"
 VENV_DIR="${PROJECT_DIR}/.venv"
-TRAIN_SCRIPT="${PROJECT_DIR}/main.py"
+TRAIN_SCRIPT="${PROJECT_DIR}/main_aug.py"
 
 cd "${PROJECT_DIR}"
 

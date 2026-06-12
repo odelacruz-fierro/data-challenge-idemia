@@ -38,7 +38,7 @@ def main():
     # ------------------------------------------------------------
     # Transformation pipelines
     # ------------------------------------------------------------
-    '''
+    
     train_transforms = T.Compose([
         T.Resize((224, 224)), 
         
@@ -55,9 +55,8 @@ def main():
         # From ImageNet
         T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
+    
     '''
-    
-    
     train_transforms = T.Compose([
         # 1. Simule les visages excentrés/coupés (Intervals 2 & 3 -> 0.40, 0.41)
         # On ne crop que très peu (max 15%) pour rester dans les clous du dataset
@@ -82,7 +81,7 @@ def main():
         # 7. Normalisation ImageNet finale pour ton ResNet50
         T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
-    
+    '''
 
     val_transforms = T.Compose([
         T.Resize((224, 224)),
@@ -249,17 +248,17 @@ def main():
         
         if idemia_val_score < best_score:
             print(f"\n🔥🔥🔥New best score! ({best_score:.4f} --> {idemia_val_score:.4f}). Saving model...🔥🔥🔥")
-            torch.save(model.state_dict(), f"/{config.OUTPUT_DIR}/best_model_aug.pth")
+            torch.save(model.state_dict(), f"/{config.OUTPUT_DIR}/best_model.pth")
             
             print(f"\nSaving validation_predictions.csv to =  {config.OUTPUT_DIR}/")
-            val_results_df.to_csv(f"/{config.OUTPUT_DIR}/best_validation_predictions_aug.csv", sep=',', index=False)
+            val_results_df.to_csv(f"/{config.OUTPUT_DIR}/best_validation_predictions.csv", sep=',', index=False)
 
             best_score = idemia_val_score 
 
     # --- Export history ----
     history_df = pd.DataFrame(training_history)
-    history_df.to_csv(f"/{config.OUTPUT_DIR}/training_history_aug.csv", sep=',', index=False)
-    print(f"\nTraining complete! ✅\n\nSaving training_history_aug.csv to {config.OUTPUT_DIR}/\n")
+    history_df.to_csv(f"/{config.OUTPUT_DIR}/training_history.csv", sep=',', index=False)
+    print(f"\nTraining complete! ✅\n\nSaving training_history.csv to {config.OUTPUT_DIR}/\n")
 
 if __name__ == "__main__":
     main()
