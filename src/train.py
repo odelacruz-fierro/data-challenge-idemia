@@ -21,7 +21,7 @@ def train_one_epoch(model, dataloader, optimizer, criterion_occ, criterion_gende
         X = X.to(config.DEVICE)
         y = y.to(config.DEVICE)
         y = y.view(-1, 1)
-        gender = gender.to(config.DEVICE).long()
+        gender = gender.to(config.DEVICE).float().view(-1, 1)
 
         # Reset gradients
         optimizer.zero_grad()

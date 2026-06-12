@@ -74,7 +74,7 @@ def main():
     print("#")
     print("#=" * 30)
 
-    EXPERIMENTS = [folder.name for folder in os.scandir(f"/{config.OUOTPUT_DIR}") if folder.is_dir()]
+    EXPERIMENTS = [folder.name for folder in os.scandir(f"/{config.OUTPUT_DIR}") if folder.is_dir()]
     EXPERIMENTS.sort()    
 
     print('\n')
@@ -86,7 +86,7 @@ def main():
     selected_model = int(selected_model)
     print(f"Selected model ==> {EXPERIMENTS[selected_model - 1]}")
 
-    MODEL_PATH = f"/{config.OUOTPUT_DIR}/{EXPERIMENTS[selected_model - 1]}/best_model.pth"
+    MODEL_PATH = f"/{config.OUTPUT_DIR}/{EXPERIMENTS[selected_model - 1]}/best_model.pth"
 
     if os.path.exists(MODEL_PATH):
         print(f"Model FOUND!")
@@ -98,6 +98,7 @@ def main():
     # --- Build model ---
     print("\nBuilding model and loading weights...")
     model = mtl.MultiTaskMobileNet().to(config.DEVICE)
+    #model = mtl.MultiTaskResNet50().to(config.DEVICE)
     model.load_state_dict(torch.load(MODEL_PATH))
     model.eval()
 
@@ -120,7 +121,7 @@ def main():
 
     # --- Export predictions ---
     results_df['gender'] = 'x'
-    results_df.to_csv(f"/{config.OUOTPUT_DIR}/{EXPERIMENTS[selected_model - 1]}/test_predictions.csv", sep=',', index=False)
+    results_df.to_csv(f"/{config.OUTPUT_DIR}/{EXPERIMENTS[selected_model - 1]}/test_predictions.csv", sep=',', index=False)
  
 
 if __name__ == "__main__":

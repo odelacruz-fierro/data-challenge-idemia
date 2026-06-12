@@ -12,6 +12,7 @@ import torchvision.transforms as T
 
 import torch
 import torch.nn as nn
+from torch.optim.lr_scheduler import CosineAnnealingLR
 
 
 import torchvision
@@ -159,9 +160,9 @@ def main():
     #model = torchvision.models.mobilenet_v3_small(num_classes=1)
     #model = model.to(config.DEVICE)
 
-    #model = mtl.MultiTaskMobileNet().to(config.DEVICE)
+    model = mtl.MultiTaskMobileNet().to(config.DEVICE)
 
-    model = mtl.MultiTaskResNet50().to(config.DEVICE)
+    #model = mtl.MultiTaskResNet50().to(config.DEVICE)
 
     # Display model information
     if config.MODEL_INFO:
@@ -174,16 +175,29 @@ def main():
 
     # --- Loss function ---
     criterion_occ = nn.MSELoss()
-    criterion_gender = nn.CrossEntropyLoss()
+    #criterion_gender = nn.CrossEntropyLoss()
+    criterion_gender = nn.BCEWithLogitsLoss()
 
     # --- Optimizer ---
     # optimizer = torch.optim.Adam(model.parameters(), lr = config.LEARNING_RATE)
 
+    #optimizer = torch.optim.AdamW(
+    #    model.parameters(), 
+    #    lr = config.LEARNING_RATE,
+    #    weight_decay = 1e-4  # Standard value for regularization
+    #)
+
     optimizer = torch.optim.AdamW(
         model.parameters(), 
-        lr = config.LEARNING_RATE,
-        weight_decay = 1e-4  # Standard value for regularization
+        lr=config.LEARNING_RATE,    # Garde ton LR de base (ex: 1e-4 ou 5e-5)
+        weight_decay=1e-2           # Plus fort pour calmer les dents de scie
     )
+
+    scheduler = CosineAnnealingLR(
+        optimizer, 
+        T_max=config.NUM_EPOCHS,                   # Nombre total d'époques de ton run
+        eta_min=1e-6                # Le LR minimum en fin de course (très proche de 0)
+    )      
 
     # --- Best score ---
     best_score = float('inf')
@@ -218,9 +232,13 @@ def main():
             epoch = epoch
         )
 
+        scheduler.step()
+        current_lr = optimizer.param_groups[0]['lr']
+
         # --- Epoch's data ---
         training_history.append({
             'epoch': epoch,
+            'LR': current_lr,
             'gamma_gender':config.GAMMA_GENDER, 
             'idemia_val_score': idemia_val_score,
             'train_loss_total': train_metrics['loss_total'],
@@ -229,21 +247,23 @@ def main():
             'val_loss_total': val_metrics['loss_total'],
             'val_loss_occ': val_metrics['loss_occ'],
             'val_loss_gender': val_metrics['loss_gender'] 
-        })
+        })        
 
+        print(f"📉 Epoch {epoch} complete. Learning rate updated to: {current_lr:.6f}")
+        
         if idemia_val_score < best_score:
             print(f"\n🔥🔥🔥New best score! ({best_score:.4f} --> {idemia_val_score:.4f}). Saving model...🔥🔥🔥")
-            torch.save(model.state_dict(), f"/{config.OUOTPUT_DIR}/best_model.pth")
+            torch.save(model.state_dict(), f"/{config.OUTPUT_DIR}/best_model.pth")
             
-            print(f"\nSaving validation_predictions.csv to =  {config.OUOTPUT_DIR}/")
-            val_results_df.to_csv(f"/{config.OUOTPUT_DIR}/best_validation_predictions.csv", sep=',', index=False)
+            print(f"\nSaving validation_predictions.csv to =  {config.OUTPUT_DIR}/")
+            val_results_df.to_csv(f"/{config.OUTPUT_DIR}/best_validation_predictions.csv", sep=',', index=False)
 
-            best_score = idemia_val_score
+            best_score = idemia_val_score 
 
     # --- Export history ----
     history_df = pd.DataFrame(training_history)
-    history_df.to_csv(f"/{config.OUOTPUT_DIR}/training_history.csv", sep=',', index=False)
-    print(f"\nTraining complete! ✅\n\nSaving training_history.csv to {config.OUOTPUT_DIR}/\n")
+    history_df.to_csv(f"/{config.OUTPUT_DIR}/training_history.csv", sep=',', index=False)
+    print(f"\nTraining complete! ✅\n\nSaving training_history.csv to {config.OUTPUT_DIR}/\n")
 
 if __name__ == "__main__":
     main()

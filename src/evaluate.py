@@ -40,11 +40,12 @@ def validation_one_epoch(model, dataloader, criterion_occ, criterion_gender, gam
             X = X.to(config.DEVICE)
             y = y.to(config.DEVICE)
             y = y.view(-1, 1)
-            gender = gender.to(config.DEVICE).long()
+            gender = gender.to(config.DEVICE).float().view(-1, 1)
 
             # --- Forward pass ---
             pred_occ, pred_gender = model(X)                # Occlusion
-            pred_gender_class = pred_gender.argmax(dim=1)   # Gender
+            #pred_gender_class = pred_gender.argmax(dim=1)   # Gender
+            pred_gender_class = (pred_gender > 0).int()
 
             # --- Compute loss ---
             loss_occ = criterion_occ(pred_occ, y)
@@ -69,7 +70,7 @@ def validation_one_epoch(model, dataloader, criterion_occ, criterion_gender, gam
                     'pred': pred_occ_cpu[i].item(),
                     'target': y_cpu[i].item(),
                     'gender': gender_cpu[i].item(),
-                    'gender_pred': int(pred_gender_class_cpu[i].item())
+                    'gender_pred': int(pred_gender_class_cpu[i][0].item())
                 })   
         
         validation_metrics = {

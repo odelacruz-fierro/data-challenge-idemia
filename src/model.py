@@ -37,7 +37,7 @@ class MultiTaskMobileNet(nn.Module):
         # --- Define gender head ---        
         self.gender_head = nn.Sequential(
             # Outputs 2 raw values (logits)
-            nn.Linear(in_features, 2)
+            nn.Linear(in_features, 1)
         )
         
     def forward(self, x):
@@ -78,7 +78,7 @@ class MultiTaskResNet50(nn.Module):
 
         # --- Define gender head ---        
         self.gender_head = nn.Sequential(
-            nn.Linear(in_features, 2)
+            nn.Linear(in_features, 1)
         )
         
     def forward(self, x):

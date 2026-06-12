@@ -8,24 +8,24 @@ import torch
 # --- Main directories ---
 
 # --- Local ---
-#PROJECT_DIR = os.getcwd()           # Retrieve current directory
-#PROJECT_DIR = PROJECT_DIR[1:]       # Removed "/" at index 0 for clarity
+PROJECT_DIR = os.getcwd()           # Retrieve current directory
+PROJECT_DIR = PROJECT_DIR[1:]       # Removed "/" at index 0 for clarity
 
 # --- Telecom Cluster ---
-PROJECT_DIR = "home/infres/odelacruz-25/data-challenge-idemia"
+#PROJECT_DIR = "home/infres/odelacruz-25/data-challenge-idemia"
 
 DATA_DIR = "data"
 RAW_DATA_DIR = f"{PROJECT_DIR}/{DATA_DIR}"
 IMAGE_DIR = f"{RAW_DATA_DIR}/crops/Crop_224_5fp_100K"
-OUOTPUT_DIR = f"{PROJECT_DIR}/outputs"
+OUTPUT_DIR = f"{PROJECT_DIR}/outputs"
 
 # --- Data files ---
 DF_TRAIN = f"/{RAW_DATA_DIR}/occlusion_datasets/train.csv"
 DF_TEST = f"/{RAW_DATA_DIR}/occlusion_datasets/test_students.csv"
 IMAGE_TEST = f"/{IMAGE_DIR}/database1/img00000048.webp"
 
-VAL_PREDICTIONS = f"/{OUOTPUT_DIR}/best_validation_predictions.csv"
-TRAIN_HISTORY = f"/{OUOTPUT_DIR}/training_history.csv"
+VAL_PREDICTIONS = f"/{OUTPUT_DIR}/best_validation_predictions.csv"
+TRAIN_HISTORY = f"/{OUTPUT_DIR}/training_history.csv"
 
 # ======================================================
 # Data processing
@@ -46,7 +46,7 @@ DEVICE = torch.device("cuda:0" if USE_CUDA else "cpu")
 
 # Training
 LEARNING_RATE = 0.001
-NUM_EPOCHS = 50
+NUM_EPOCHS = 2
 
 #GAMMA_GENDER = 0.1
 #GAMMA_GENDER = 0.024
