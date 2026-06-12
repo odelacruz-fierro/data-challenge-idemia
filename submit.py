@@ -96,9 +96,8 @@ def main():
 
     
     # --- Build model ---
-    print("\nBuilding model and loading weights...")
-    model = mtl.MultiTaskMobileNet().to(config.DEVICE)
-    #model = mtl.MultiTaskResNet50().to(config.DEVICE)
+    print("\nBuilding model and loading weights...")    
+    model = mtl.MultiTaskResNet50().to(config.DEVICE)
     model.load_state_dict(torch.load(MODEL_PATH))
     model.eval()
 
