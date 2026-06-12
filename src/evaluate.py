@@ -58,20 +58,30 @@ def validation_one_epoch(model, dataloader, criterion_occ, criterion_gender, gam
             running_gender += loss_gender.item()
 
             # --- Move batch to cpu ---
-            pred_occ_cpu = pred_occ.detach().cpu()
-            y_cpu = y.detach().cpu()
-            gender_cpu = gender.detach().cpu()
-            pred_gender_class_cpu = pred_gender_class.detach().cpu()
+            #pred_occ_cpu = pred_occ.detach().cpu()
+            #y_cpu = y.detach().cpu()
+            #gender_cpu = gender.detach().cpu()
+            #pred_gender_class_cpu = pred_gender_class.detach().cpu()
+
+            pred_occ_gpu = pred_occ.detach()
             
             # --- Gather outputs ---
             for i in range(len(X)):
+                #results_list.append({
+                #    'filename': filename[i],
+                #    'pred': pred_occ_cpu[i].item(),
+                #    'target': y_cpu[i].item(),
+                #    'gender': gender_cpu[i].item(),
+                #    'gender_pred': int(pred_gender_class_cpu[i][0].item())
+                #})
+            
                 results_list.append({
                     'filename': filename[i],
-                    'pred': pred_occ_cpu[i].item(),
-                    'target': y_cpu[i].item(),
-                    'gender': gender_cpu[i].item(),
-                    'gender_pred': int(pred_gender_class_cpu[i][0].item())
-                })   
+                    'pred': pred_occ_gpu[i][0].item(),  # Ajout de [0] pour la dimension 2D
+                    'target': y[i][0].item(),           # Idem
+                    'gender': gender[i][0].item(),       # Idem
+                    'gender_pred': pred_gender_class[i][0].item() # Idem
+                })
         
         validation_metrics = {
             'loss_total': running_total / len(dataloader),
