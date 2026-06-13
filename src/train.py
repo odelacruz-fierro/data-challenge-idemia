@@ -4,6 +4,7 @@ from src import config
 from tqdm import tqdm
 import numpy as np
 import torch
+import pandas as pd
 
 def batch_gender_counts(gender_batch, epoch):
     """
@@ -77,7 +78,11 @@ def train_one_epoch(model, dataloader, optimizer, criterion_occ, criterion_gende
             }
             gender_epoch_distribution.append(batch_counts)
 
-            # --- Write here the csv directly ---
+    # --- Write here the csv directly ---
+    if epoch in config.TARGET_EPOCHS:
+        print(f"\nSaving validation_predictions.csv to =  {config.OUTPUT_DIR}/")
+        gender_epoch_dist_df = pd.DataFrame(gender_epoch_distribution)
+        gender_epoch_dist_df.to_csv(f"/{config.OUTPUT_DIR}/epoch_{epoch}_gender_dist_aug.csv", sep=',', index=False)
 
     train_metrics = {
         'loss_total': running_total / len(dataloader),
