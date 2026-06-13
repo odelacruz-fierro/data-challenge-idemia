@@ -6,7 +6,7 @@ import torch
 # ======================================================
 
 # --- Main directories ---
-LOCAL = True
+LOCAL = False
 
 if LOCAL:
     # --- Local ---
@@ -20,7 +20,7 @@ else:
 # --- Models menu ---
 
 MODELS =["MultiTaskMobileNet","MultiTaskResNet50"]
-MODEL = MODELS[0]
+MODEL = MODELS[1]
 
 
 
@@ -51,8 +51,8 @@ DATA_CHECK = False
 # Training
 # ======================================================
 
-#TARGET_EPOCHS = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150]
-TARGET_EPOCHS = [1, 3]
+TARGET_EPOCHS = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150]
+
 
 # Device
 USE_CUDA = torch.cuda.is_available()
@@ -61,7 +61,7 @@ DEVICE = torch.device("cuda:0" if USE_CUDA else "cpu")
 
 # Training
 LEARNING_RATE = 0.001
-NUM_EPOCHS = 3
+NUM_EPOCHS = 150
 
 #GAMMA_GENDER = 0.1
 #GAMMA_GENDER = 0.024
