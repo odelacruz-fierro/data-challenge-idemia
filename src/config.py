@@ -42,6 +42,8 @@ DATA_CHECK = False
 # Training
 # ======================================================
 
+TARGET_EPOCHS = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150]
+
 # Device
 USE_CUDA = torch.cuda.is_available()
 DEVICE = torch.device("cuda:0" if USE_CUDA else "cpu")

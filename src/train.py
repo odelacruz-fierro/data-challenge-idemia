@@ -2,7 +2,20 @@
 
 from src import config
 from tqdm import tqdm
+import numpy as np
+import torch
 
+def batch_gender_counts(gender_batch, epoch):
+    """
+    Analyse les batchs d'une époque donnée et affiche la distribution.
+    """
+    if epoch not in config.TARGET_EPOCHS:
+        return None
+    
+    females_per_batch = int(torch.sum(gender_batch == 0.0))
+    males_per_batch = int(torch.sum(gender_batch == 1.0))
+    
+    return females_per_batch, males_per_batch 
 
 def train_one_epoch(model, dataloader, optimizer, criterion_occ, criterion_gender, gamma_gender, epoch):
     # Activate training mode
@@ -12,6 +25,9 @@ def train_one_epoch(model, dataloader, optimizer, criterion_occ, criterion_gende
     running_total = 0.0
     running_occ = 0.0
     running_gender = 0.0
+
+    # Gender tracker
+    gender_epoch_distribution = []
 
     pbar = tqdm(enumerate(dataloader), total=len(dataloader), desc=f"Training-Epoch {epoch}")
 
@@ -51,6 +67,17 @@ def train_one_epoch(model, dataloader, optimizer, criterion_occ, criterion_gende
         total_loss.backward()
         # Update model weights
         optimizer.step()
+        
+        if epoch in config.TARGET_EPOCHS:
+            f_batch_counts, m_batch_counts  = batch_gender_counts(gender, epoch)
+            batch_counts = {
+                'batch_idx':batch_idx,
+                'f_counts': f_batch_counts,
+                'm_counts': m_batch_counts
+            }
+            gender_epoch_distribution.append(batch_counts)
+
+            # --- Write here the csv directly ---
 
     train_metrics = {
         'loss_total': running_total / len(dataloader),
