@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=resnet50-run15
+#SBATCH --job-name=resnet50-run16
 #SBATCH --output=slurm-%x_%j.out
 #SBATCH --error=slurm-%x_%j.err
 #SBATCH --partition=3090
