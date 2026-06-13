@@ -157,8 +157,18 @@ def main():
 
     if config.USE_CUDA:
         torch.backends.cudnn.benchmark = True    
+    
+    match config.MODEL:
+        case "MultiTaskMobileNet":
+            print(f"Model {config.MODEL} is being build")
+            model = mtl.MultiTaskMobileNet().to(config.DEVICE)
 
-    model = mtl.MultiTaskResNet50().to(config.DEVICE)
+        case "MultiTaskResNet50":
+            print(f"Model {config.MODEL} is being build")  
+            model = mtl.MultiTaskResNet50().to(config.DEVICE)
+        case _:
+            print("Not a valid model !!!")  # Default case
+
 
     # Display model information
     if config.MODEL_INFO:

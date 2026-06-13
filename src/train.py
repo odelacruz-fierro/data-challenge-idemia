@@ -80,7 +80,7 @@ def train_one_epoch(model, dataloader, optimizer, criterion_occ, criterion_gende
 
     # --- Write here the csv directly ---
     if epoch in config.TARGET_EPOCHS:
-        print(f"\nSaving validation_predictions.csv to =  {config.OUTPUT_DIR}/")
+        print(f"\nSaving epoch {epoch} gender counts to =  {config.OUTPUT_DIR}/")
         gender_epoch_dist_df = pd.DataFrame(gender_epoch_distribution)
         gender_epoch_dist_df.to_csv(f"/{config.OUTPUT_DIR}/epoch_{epoch}_gender_dist_aug.csv", sep=',', index=False)
 

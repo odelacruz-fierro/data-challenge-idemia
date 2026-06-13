@@ -6,14 +6,23 @@ import torch
 # ======================================================
 
 # --- Main directories ---
+LOCAL = True
+
+if LOCAL:
+    # --- Local ---
+    PROJECT_DIR = os.getcwd()           # Retrieve current directory
+    PROJECT_DIR = PROJECT_DIR[1:]       # Removed "/" at index 0 for clarity
+else:
+    # --- Telecom Cluster ---
+    PROJECT_DIR = "home/infres/odelacruz-25/data-challenge-idemia"
 
 
-# --- Telecom Cluster ---
-PROJECT_DIR = "home/infres/odelacruz-25/data-challenge-idemia"
+# --- Models menu ---
 
-# --- Local ---
-#PROJECT_DIR = os.getcwd()           # Retrieve current directory
-#PROJECT_DIR = PROJECT_DIR[1:]       # Removed "/" at index 0 for clarity
+MODELS =["MultiTaskMobileNet","MultiTaskResNet50"]
+MODEL = MODELS[0]
+
+
 
 
 
@@ -42,7 +51,8 @@ DATA_CHECK = False
 # Training
 # ======================================================
 
-TARGET_EPOCHS = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150]
+#TARGET_EPOCHS = [1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150]
+TARGET_EPOCHS = [1, 3]
 
 # Device
 USE_CUDA = torch.cuda.is_available()
@@ -51,7 +61,7 @@ DEVICE = torch.device("cuda:0" if USE_CUDA else "cpu")
 
 # Training
 LEARNING_RATE = 0.001
-NUM_EPOCHS = 150
+NUM_EPOCHS = 3
 
 #GAMMA_GENDER = 0.1
 #GAMMA_GENDER = 0.024
