@@ -49,7 +49,7 @@ DEVICE = torch.device("cuda:0" if USE_CUDA else "cpu")
 
 # Training
 LEARNING_RATE = 0.001
-NUM_EPOCHS = 50
+NUM_EPOCHS = 150
 
 #GAMMA_GENDER = 0.1
 #GAMMA_GENDER = 0.024
