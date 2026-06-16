@@ -6,7 +6,7 @@ import torch
 # ======================================================
 
 # --- Main directories ---
-LOCAL = False
+LOCAL = True
 
 if LOCAL:
     # --- Local ---

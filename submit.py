@@ -60,7 +60,6 @@ def main():
     # Dataset and Dataloader
     # ------------------------------------------------------------
     test_set = dataset.Dataset(df_test, config.IMAGE_DIR, training=False, transform=val_transforms)
-    #test_set = dataset.Dataset(df_test, config.IMAGE_DIR, training=False)
     test_generator = torch.utils.data.DataLoader(test_set, **config.params_val)
 
     # ------------------------------------------------------------
@@ -97,8 +96,24 @@ def main():
     
     # --- Build model ---
     print("\nBuilding model and loading weights...")    
-    model = mtl.MultiTaskResNet50().to(config.DEVICE)
+
+    match config.MODEL:
+        case "MultiTaskMobileNet":
+            print(f"Model {config.MODEL} is being build")
+            model = mtl.MultiTaskMobileNet().to(config.DEVICE)
+            model.load_state_dict(torch.load(MODEL_PATH))
+
+        case "MultiTaskResNet50":
+            print(f"Model {config.MODEL} is being build")
+            model = mtl.MultiTaskResNet50().to(config.DEVICE)
+            model.load_state_dict(torch.load(MODEL_PATH))
+
+        case _:
+            print("Not a valid model !!!")  # Default case
+    
     model.load_state_dict(torch.load(MODEL_PATH))
+
+
     model.eval()
 
     results_list = []
