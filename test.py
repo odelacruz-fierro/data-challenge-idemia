@@ -29,7 +29,6 @@ def main():
     print("# Welcome to Data IADATA704 data challenge TEST pipeline")
     print("# Powered By Idemia and Télécom Paris")
     print("#")
-    print("# By Oscar DE LA CRUZ")
     print("#")
     print("#")
     print("*" * 60)
@@ -113,9 +112,7 @@ def main():
     
     model.load_state_dict(torch.load(MODEL_PATH))
 
-
     model.eval()
-
     results_list = []
 
     with torch.inference_mode():
